@@ -1,8 +1,8 @@
-package dk.itu.spct.SimpleTriggerProtocol;
+package dk.itu.spct.f2014.pmor.janv.ma01.utils;
 
 import com.google.gson.*;
 
-public class Message {
+public class TriggerMessage {
 	public static final String actionSpecifier = "action";
 	public static final String deviceIdSpecifier = "deviceId";
 	public static final String nameSpecifier = "name";
@@ -13,16 +13,16 @@ public class Message {
 	private String deviceId = "";
 	private String name = "";
 	
-	public Message() { }
+	public TriggerMessage() { }
 	
-	public Message(String action, String deviceId, String name) {
+	public TriggerMessage(String action, String deviceId, String name) {
 		setAction(action);
 		setDeviceId(deviceId);
 		setName(name);
 	}
 	
-	public static Message fromJson(String json) {
-		return gson.fromJson(json, Message.class);
+	public static TriggerMessage fromJson(String json) {
+		return gson.fromJson(json, TriggerMessage.class);
 	}
 	
 	public String toJson() {

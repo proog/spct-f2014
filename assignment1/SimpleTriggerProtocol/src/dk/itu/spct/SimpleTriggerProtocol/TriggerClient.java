@@ -6,6 +6,8 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import dk.itu.spct.f2014.pmor.janv.ma01.utils.TriggerMessage;
+
 public class TriggerClient {
 
 	/**
@@ -13,7 +15,7 @@ public class TriggerClient {
 	 */
 	public static void main(String[] args) {
 		try {
-			Message m = new Message("start", "bt-o32042-sdfsjeoq", "hillemænd");
+			TriggerMessage m = new TriggerMessage("start", "bt-o32042-sdfsjeoq", "hillemænd");
 			Socket socket = new Socket("localhost", TriggerServer.PORT);
 			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 			writer.write(m.toJson());

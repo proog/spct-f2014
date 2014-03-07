@@ -5,6 +5,8 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import dk.itu.spct.f2014.pmor.janv.ma01.utils.TriggerMessage;
+
 public class TriggerServer extends Thread {
 	public static final int PORT = 3345;
 	
@@ -85,7 +87,7 @@ public class TriggerServer extends Thread {
 	 * Called from each client communication thread spawned by this instance.
 	 * @param m The message
 	 */
-	public synchronized void messageReceived(Message m) {
+	public synchronized void messageReceived(TriggerMessage m) {
 		for(MessageReceivedObserver o : observers)
 			o.messageReceived(m);
 	}

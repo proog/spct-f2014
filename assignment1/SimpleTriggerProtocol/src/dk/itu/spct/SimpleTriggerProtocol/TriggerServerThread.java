@@ -3,6 +3,8 @@ package dk.itu.spct.SimpleTriggerProtocol;
 import java.io.*;
 import java.net.*;
 
+import dk.itu.spct.f2014.pmor.janv.ma01.utils.TriggerMessage;
+
 public class TriggerServerThread extends Thread {
 	private Socket socket;
 	private TriggerServer callback;
@@ -31,7 +33,7 @@ public class TriggerServerThread extends Thread {
 			
 			// tell the TriggerServer a message has been received
 			if(callback != null)
-				callback.messageReceived(Message.fromJson(sb.toString()));
+				callback.messageReceived(TriggerMessage.fromJson(sb.toString()));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
