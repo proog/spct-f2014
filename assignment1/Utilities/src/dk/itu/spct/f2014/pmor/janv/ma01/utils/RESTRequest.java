@@ -1,4 +1,4 @@
-package dk.itu.spct.f2014.lab04.util.REST;
+package dk.itu.spct.f2014.pmor.janv.ma01.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
