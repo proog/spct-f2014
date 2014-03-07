@@ -10,8 +10,6 @@ import com.google.gson.annotations.SerializedName;
  * 
  */
 public class BLIPDevice {
-
-	// TODO testing contributions with new email in sourcetree
 	
 	@SerializedName("last-event-description")
 	private String lastEventDescription;
