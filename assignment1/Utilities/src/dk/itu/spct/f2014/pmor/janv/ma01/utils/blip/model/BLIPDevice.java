@@ -3,8 +3,8 @@ package dk.itu.spct.f2014.pmor.janv.ma01.utils.blip.model;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * A class used to wrap the {@code JSON} returned by the BLIP {@code REST} web
- * service.
+ * A class used to wrap the JSON that is returned by the BLIP REST web service
+ * when querying the it for information about a particular terminal (device).
  * 
  * @author Janus Varmarken
  * 
