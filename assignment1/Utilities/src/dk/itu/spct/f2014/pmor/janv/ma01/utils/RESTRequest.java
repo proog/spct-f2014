@@ -24,28 +24,27 @@ public class RESTRequest {
 
 	/**
 	 * Create a new {@code RESTRequest} that uses {@code restBaseURL} for its
-	 * base {@code URL}. This base {@code URL} can be augmented with an element
-	 * ID when the request is fired using {@link #performRequest(String)}.
+	 * base URL. This base URL can be augmented with an element ID when the
+	 * request is fired using {@link #performRequest(String)}.
 	 * 
 	 * @param restBaseURL
-	 *            The base {@code URL} for this {@code REST} request.
+	 *            The base URL for this REST request.
 	 * @throws NullPointerException
-	 *             if {@code restBaseURL} is null.
+	 *             if {@code restBaseURL} is {@code null}.
 	 */
 	public RESTRequest(String restBaseURL) {
-		this.restBaseURL = Objects.requireNonNull(restBaseURL);;
+		this.restBaseURL = Objects.requireNonNull(restBaseURL);
 	}
 
 	/**
-	 * Performs an {@code HTTP GET} request to a {@link URL} created by
-	 * combining the {@link #restBaseURL} followed by the {@code elementId}. The
-	 * response is returned as a {@link String}.
+	 * Performs an HTTP GET request to a {@link URL} created by combining the
+	 * {@link #restBaseURL} followed by the {@code elementId}. The response is
+	 * returned as a {@link String}.
 	 * 
 	 * @param elementId
-	 *            The ID used for the {@code REST} query (specifies the
-	 *            element(s) to look up). This is relative to the
-	 *            {@link #restBaseURL}.
-	 * @return The {@code HTTP} response body or {@code null} if the response
+	 *            The ID used for the REST query (specifies the element(s) to
+	 *            look up). This is relative to the {@link #restBaseURL}.
+	 * @return The HTTP response body or {@code null} if the response
 	 *         code is not {@code 200}.
 	 * @throws IOException
 	 *             if an {@link HttpURLConnection} cannot be established to the
@@ -53,7 +52,7 @@ public class RESTRequest {
 	 *             {@code elementId}. Also thrown if the connection is
 	 *             established but reading from it fails.
 	 * @throws NullPointerException
-	 *             if {@code elementId} is null.
+	 *             if {@code elementId} is {@code null}.
 	 */
 	public String performRequest(String elementId) throws IOException {
 		Objects.requireNonNull(elementId);

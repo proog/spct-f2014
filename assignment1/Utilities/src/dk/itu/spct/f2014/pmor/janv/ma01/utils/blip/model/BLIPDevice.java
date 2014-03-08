@@ -1,5 +1,9 @@
 package dk.itu.spct.f2014.pmor.janv.ma01.utils.blip.model;
 
+import java.util.Objects;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -25,6 +29,41 @@ public class BLIPDevice implements IBLIPDeviceDataContract {
 	@SerializedName("terminal-id")
 	private String terminalId;
 
+	/**
+	 * Utility factory method to create a {@code BLIPDevice} from a JSON string.
+	 * 
+	 * @param json
+	 *            A JSON string containing data that can be decoded to a
+	 *            {@link BLIPDevice}.
+	 * @return The {@link BLIPDevice} created from the provided JSON or
+	 *         {@code null} if the provided JSON cannot be parsed to an instance
+	 *         of {@link BLIPDevice}.
+	 * @throws NullPointerException
+	 *             if {@code json} is {@code null}.
+	 */
+	public static BLIPDevice createFromJson(String json) {
+		/*
+		 * TODO: It seems that JsonSyntaxException is only raised if the
+		 * provided JSON is not valid JSON syntax. However, the
+		 * Gson.fromJson(String, Class<T>) doc stipulates that this exception
+		 * will also be raised if the provided JSON is valid JSON but doesn't
+		 * match an instance of the class parameter. It seems that a string
+		 * parameter containing valid JSON that however does not match the class
+		 * parameter with regards to instance creation results in instances of
+		 * the class parameter that have their instance fields set to the
+		 * default values. Needs more thorough testing.
+		 */
+		try {
+			return new Gson().fromJson(Objects.requireNonNull(json),
+					BLIPDevice.class);
+		}
+		catch(JsonSyntaxException jse) {
+			System.err.println("JSON error: " + jse.getMessage());
+			jse.printStackTrace();
+			return null;
+		}
+	}
+
 	@Override
 	public String getLastEventDescription() {
 		return lastEventDescription;
@@ -33,7 +72,7 @@ public class BLIPDevice implements IBLIPDeviceDataContract {
 	public void setLastEventDescription(String lastEventDescription) {
 		this.lastEventDescription = lastEventDescription;
 	}
-	
+
 	@Override
 	public long getLastEventTimestamp() {
 		return lastEventTimestamp;
