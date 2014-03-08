@@ -2,7 +2,6 @@ package dk.itu.spct.f2014.pmor.janv.ma01.utils.blip.webservice;
 
 import java.io.IOException;
 
-import dk.itu.spct.f2014.pmor.janv.ma01.utils.blip.model.BLIPDevice;
 import dk.itu.spct.f2014.pmor.janv.ma01.utils.blip.model.IBLIPDeviceDataContract;
 
 /**
@@ -24,9 +23,9 @@ public interface IBLIPDeviceUpdateProvider<DEVICE_MODEL extends IBLIPDeviceDataC
 	 * 
 	 * @param deviceId
 	 *            The ID of the device to search for.
-	 * @return A {@link BLIPDevice} containing device information if the device
-	 *         is found in the BLIP system. {@code null} if the device was not
-	 *         found in the BLIP system.
+	 * @return An {@link IBLIPDeviceDataContract} implementation containing
+	 *         device information if the device is found in the BLIP system.
+	 *         {@code null} if the device was not found in the BLIP system.
 	 */
 	DEVICE_MODEL getDeviceUpdate(String deviceId) throws IOException;
 }
