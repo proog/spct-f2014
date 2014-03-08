@@ -4,13 +4,13 @@ import com.google.gson.annotations.SerializedName;
 
 /**
  * A class used to wrap the JSON that is returned by the BLIP REST web service
- * when querying the it for information about a particular terminal (device).
+ * when querying it for information about a particular terminal (device).
  * 
  * @author Janus Varmarken
  * 
  */
-public class BLIPDevice {
-	
+public class BLIPDevice implements IBLIPDeviceDataContract {
+
 	@SerializedName("last-event-description")
 	private String lastEventDescription;
 
@@ -25,6 +25,7 @@ public class BLIPDevice {
 	@SerializedName("terminal-id")
 	private String terminalId;
 
+	@Override
 	public String getLastEventDescription() {
 		return lastEventDescription;
 	}
@@ -32,7 +33,8 @@ public class BLIPDevice {
 	public void setLastEventDescription(String lastEventDescription) {
 		this.lastEventDescription = lastEventDescription;
 	}
-
+	
+	@Override
 	public long getLastEventTimestamp() {
 		return lastEventTimestamp;
 	}
@@ -41,6 +43,7 @@ public class BLIPDevice {
 		this.lastEventTimestamp = lastEventTimestamp;
 	}
 
+	@Override
 	public String getLocation() {
 		return location;
 	}
@@ -49,6 +52,7 @@ public class BLIPDevice {
 		this.location = location;
 	}
 
+	@Override
 	public String getMajorClassOfDevice() {
 		return majorClassOfDevice;
 	}
@@ -57,6 +61,7 @@ public class BLIPDevice {
 		this.majorClassOfDevice = majorClassOfDevice;
 	}
 
+	@Override
 	public String getTerminalId() {
 		return terminalId;
 	}
