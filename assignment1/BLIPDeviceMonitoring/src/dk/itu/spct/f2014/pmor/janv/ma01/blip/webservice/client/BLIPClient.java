@@ -16,7 +16,7 @@ import dk.itu.spct.f2014.pmor.janv.ma01.utils.blip.webservice.IBLIPDeviceUpdateP
  * 
  */
 public class BLIPClient implements IBLIPDeviceUpdateProvider<BLIPDevice> {
-	
+
 	/**
 	 * Provides a utility method to easily fire a REST request.
 	 */
@@ -26,6 +26,12 @@ public class BLIPClient implements IBLIPDeviceUpdateProvider<BLIPDevice> {
 		this.requester = new RESTRequest(Objects.requireNonNull(baseURL));
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @return A {@link BLIPDevice} containing the device data or {@code null}
+	 *         if the device was not found in the BLIP system.
+	 */
 	@Override
 	public BLIPDevice getDeviceUpdate(String deviceId) throws IOException {
 		String json = requester
