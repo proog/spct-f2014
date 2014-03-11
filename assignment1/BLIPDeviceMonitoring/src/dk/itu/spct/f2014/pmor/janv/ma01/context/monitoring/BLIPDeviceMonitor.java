@@ -91,19 +91,21 @@ public class BLIPDeviceMonitor extends AbstractMonitor {
 	@Override
 	public void monitor(String entityId) throws RemoteException {
 		try {
-			// 1. get device from BLIP system
+			// Get device from BLIP system
 			IBLIPDeviceDataContract device = this.blipService
 					.getDeviceUpdate(this.deviceId);
 			if (device != null) {
+				// Device found in BLIP system.
 				this.onDeviceFound(device);
 			} else {
+				// Device not found in the BLIP system.
 				/*
 				 * If this is an explicit call to monitor the device, we remove
-				 * it right away if it is not found. This is contrary to the
-				 * scheduled automatic updates in run() where we allow the
-				 * device to move in and out of the system (using a
-				 * "not found counter" with a threshold) in order to compensate
-				 * for the instability of the BLIP system.
+				 * the entity from the ContextService right away if it is not
+				 * found. This is contrary to the scheduled automatic updates in
+				 * run() where we allow the device to move in and out of the
+				 * system (using a "not found counter" with a threshold) in
+				 * order to compensate for the instability of the BLIP system.
 				 */
 				// Remove the entity from the ContextService
 				this.removeEntity();
@@ -112,24 +114,30 @@ public class BLIPDeviceMonitor extends AbstractMonitor {
 			/*
 			 * TODO: how to cope with error? Logging?
 			 */
+			System.err.println(String.format(
+					"%s: %s occurred in monitor(String).", this.getClass()
+							.getSimpleName(), e.getClass().getSimpleName()));
 			e.printStackTrace();
 		}
 	}
 
 	@Override
 	public void run() {
+		// TODO add ability to call stop()
 		while (true) {
 			try {
 				IBLIPDeviceDataContract device = this.blipService
 						.getDeviceUpdate(this.deviceId);
 				if (device != null) {
+					// Device found in BLIP system.
 					this.onDeviceFound(device);
 				} else {
+					// Device not found in BLIP system.
 					boolean remove = ++notFoundCount >= notFoundThreshold;
 					if (remove) {
-						// Remove the entity from the ContextService
+						// Remove the entity from the ContextService.
 						this.removeEntity();
-						// Reset counter
+						// Reset counter.
 						notFoundCount = 0;
 					}
 				}
@@ -161,19 +169,26 @@ public class BLIPDeviceMonitor extends AbstractMonitor {
 						.println(this.getClass().getSimpleName()
 								+ ": "
 								+ e.getClass().getSimpleName()
-								+ " occured in run() - could not fetch data from BLIP system.");
+								+ " occurred in run() - could not fetch data from BLIP system.");
 				e.printStackTrace();
 			}
 		}
 	}
 
+	/**
+	 * Updates the bound {@link ContextService} with new context information for
+	 * the {@link Entity} monitored by this {@code BLIPDeviceMonitor}.
+	 * 
+	 * @param device
+	 *            Device data containing context information.
+	 */
 	private void onDeviceFound(IBLIPDeviceDataContract device) {
 		assert this.deviceId.equals(device.getTerminalId());
 		Entity entity = null;
 		try {
-			// TODO is this call blocking? Figure out what to do if it isn't
+			// TODO is this call blocking? Figure out what to do if it isn't.
 			entity = this.getContextService().getEntity(this.deviceId);
-			// Is the Entity currently present in the ContextService.
+			// Is the Entity currently present in the ContextService?
 			if (entity == null) {
 				// Not present, we need to add a new entity
 				/*
@@ -196,7 +211,7 @@ public class BLIPDeviceMonitor extends AbstractMonitor {
 					.println(this.getClass().getSimpleName()
 							+ ": "
 							+ e.getClass().getSimpleName()
-							+ " occured in onDeviceFound() - could not add/update Entity in ContextService.");
+							+ " occurred in onDeviceFound() - could not add/update Entity in ContextService.");
 			e.printStackTrace();
 		}
 	}
