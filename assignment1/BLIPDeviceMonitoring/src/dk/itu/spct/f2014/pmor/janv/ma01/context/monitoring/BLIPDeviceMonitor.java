@@ -294,7 +294,7 @@ public class BLIPDeviceMonitor extends AbstractMonitor {
 			 * TODO: Handle error: logging?
 			 */
 			System.err.print(this.getClass().getSimpleName()
-					+ " end lifecycle: could remove self at ContextService");
+					+ " end lifecycle: error when attempting to remove self from ContextService");
 			e.printStackTrace();
 		}
 	}
