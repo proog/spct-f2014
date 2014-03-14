@@ -49,7 +49,9 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		Button btnStartStop = (Button) this
 				.findViewById(R.id.btnStartStopTracking);
+		// Initialize button in button in "Start tracking" mode.
 		btnStartStop.setOnClickListener(this.btnOnStartListener);
+		btnStartStop.setText(R.string.lbl_btn_start);
 	}
 
 	@Override
