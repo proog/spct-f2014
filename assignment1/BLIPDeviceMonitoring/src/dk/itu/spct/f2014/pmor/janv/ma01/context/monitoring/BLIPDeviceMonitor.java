@@ -3,6 +3,7 @@ package dk.itu.spct.f2014.pmor.janv.ma01.context.monitoring;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Objects;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import dk.itu.spct.f2014.pmor.janv.ma01.blip.webservice.client.BLIPClient;
 import dk.itu.spct.f2014.pmor.janv.ma01.utils.blip.model.IBLIPDeviceDataContract;
@@ -76,6 +77,18 @@ public class BLIPDeviceMonitor extends AbstractMonitor {
 	 */
 	private final int notFoundThreshold = 5;
 
+	/**
+	 * Specifies if this monitor is still active. Use {@link #locker} for
+	 * synchronizing access.
+	 */
+	private boolean alive = true;
+
+	/**
+	 * Provides synchronization for fields that are concurrently accessed by
+	 * more threads, e.g. {@link #alive}.
+	 */
+	private ReentrantReadWriteLock locker = new ReentrantReadWriteLock(true);
+
 	public BLIPDeviceMonitor(
 			String service_uri,
 			IBLIPDeviceUpdateProvider<? extends IBLIPDeviceDataContract> blipService,
@@ -121,10 +134,20 @@ public class BLIPDeviceMonitor extends AbstractMonitor {
 		}
 	}
 
+	/**
+	 * Stops this monitor so that it will no longer feed its associated
+	 * {@link ContextService} with device information.
+	 */
+	public void stopMonitoring() {
+		this.locker.writeLock().lock();
+		this.alive = false;
+		this.locker.writeLock().unlock();
+	}
+
 	@Override
 	public void run() {
 		// TODO add ability to call stop()
-		while (true) {
+		while (this.isAlive()) {
 			try {
 				IBLIPDeviceDataContract device = this.blipService
 						.getDeviceUpdate(this.deviceId);
@@ -172,6 +195,23 @@ public class BLIPDeviceMonitor extends AbstractMonitor {
 								+ " occurred in run() - could not fetch data from BLIP system.");
 				e.printStackTrace();
 			}
+		}
+		this.removeFromContextService();
+	}
+
+	/**
+	 * Provides thread safe access to {@link #alive}.
+	 * 
+	 * @return {@code true} if this monitor is still alive, i.e. if it still
+	 *         feeds its associated {@link ContextService} with device
+	 *         information. {@code false} if this monitor is no longer alive.
+	 */
+	private boolean isAlive() {
+		try {
+			this.locker.readLock().lock();
+			return this.alive;
+		} finally {
+			this.locker.readLock().unlock();
 		}
 	}
 
@@ -245,5 +285,23 @@ public class BLIPDeviceMonitor extends AbstractMonitor {
 	 */
 	private void removeEntity() throws RemoteException {
 		this.getContextService().removeEntity(this.deviceId);
+	}
+
+	/**
+	 * Utility method for removing this monitor from its associated
+	 * {@link ContextService}.
+	 */
+	private void removeFromContextService() {
+		try {
+			this.getContextService().removeContextClient(
+					RemoteContextClient.TYPE_MONITOR, Location.class, this);
+		} catch (RemoteException e) {
+			/*
+			 * TODO: Handle error: logging?
+			 */
+			System.err.print(this.getClass().getSimpleName()
+					+ " end lifecycle: could remove self at ContextService");
+			e.printStackTrace();
+		}
 	}
 }
