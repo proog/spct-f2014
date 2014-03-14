@@ -1,10 +1,15 @@
-package dk.itu.spct.SimpleTriggerProtocol;
+package dk.itu.spct.f2014.pmor.janv.ma01.trigger;
 
 import java.io.*;
 import java.net.*;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.lang.*;
 
+import dk.itu.spct.f2014.pmor.janv.ma01.blip.webservice.client.BLIPClient;
+import dk.itu.spct.f2014.pmor.janv.ma01.context.monitoring.BLIPDeviceMonitor;
 import dk.itu.spct.f2014.pmor.janv.ma01.utils.TriggerMessage;
 
 public class TriggerServer extends Thread {
@@ -19,6 +24,7 @@ public class TriggerServer extends Thread {
 	private boolean stop = false;
 	private ServerSocket serverSocket;
 	private List<MessageReceivedObserver> observers;
+	private HashMap<String, BLIPDeviceMonitor> monitors;
 	
 	/**
 	 * Constructor for TriggerServer on port <pre>PORT</pre>.
@@ -37,6 +43,7 @@ public class TriggerServer extends Thread {
 		serverSocket = new ServerSocket(PORT);
 		serverSocket.setSoTimeout(timeout);
 		observers = new ArrayList<>();
+		monitors = new HashMap<>();
 	}
 	
 	/**
@@ -90,20 +97,41 @@ public class TriggerServer extends Thread {
 	public synchronized void messageReceived(TriggerMessage m) {
 		for(MessageReceivedObserver o : observers)
 			o.messageReceived(m);
+		
+		if(m.getAction().equalsIgnoreCase(TriggerMessage.startAction)) {
+			addMonitor(m);
+		}
+		else if(m.getAction().equalsIgnoreCase(TriggerMessage.stopAction)) {
+			monitors.get(m.getDeviceId());
+		}
 	}
 	
 	@Override
 	public void run() {
 		startServer();
 	}
+	
+	private void addMonitor(TriggerMessage m) {
+		try {
+			BLIPClient client = new BLIPClient(BLIPClient.DEFAULT_BASE_URL);
+			BLIPDeviceMonitor monitor = new BLIPDeviceMonitor("service_uri", client, m.getDeviceId());
+			Thread t = new Thread(monitor);
+			monitors.put(m.getDeviceId(), monitor);
+			t.start();
+		} catch (RemoteException e) {
+			System.out.println("Could not add a new monitor.");
+			e.printStackTrace();
+		}
+	}
 
 	public static void main(String[] args) throws InterruptedException {
 		try {
-			TriggerServer ts = new TriggerServer();
+			/*TriggerServer ts = new TriggerServer();
 			ts.addObserver(new MessagePrinter());
 			ts.start();
 			Thread.sleep(5000);
-			ts.stopServer();
+			ts.stopServer();*/
+			new TriggerServer().startServer();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -1,4 +1,4 @@
-package dk.itu.spct.SimpleTriggerProtocol;
+package dk.itu.spct.f2014.pmor.janv.ma01.trigger;
 
 import dk.itu.spct.f2014.pmor.janv.ma01.utils.TriggerMessage;
 

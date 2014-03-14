@@ -16,6 +16,7 @@ import dk.itu.spct.f2014.pmor.janv.ma01.utils.blip.webservice.IBLIPDeviceUpdateP
  * 
  */
 public class BLIPClient implements IBLIPDeviceUpdateProvider<BLIPDevice> {
+	public static final String DEFAULT_BASE_URL = "http://pit.itu.dk:7331/location-of/";
 
 	/**
 	 * Provides a utility method to easily fire a REST request.

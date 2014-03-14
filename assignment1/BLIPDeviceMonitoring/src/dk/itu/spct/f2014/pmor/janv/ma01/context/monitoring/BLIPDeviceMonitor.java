@@ -7,10 +7,10 @@ import java.util.Objects;
 import dk.itu.spct.f2014.pmor.janv.ma01.blip.webservice.client.BLIPClient;
 import dk.itu.spct.f2014.pmor.janv.ma01.utils.blip.model.IBLIPDeviceDataContract;
 import dk.itu.spct.f2014.pmor.janv.ma01.utils.blip.webservice.IBLIPDeviceUpdateProvider;
+import dk.itu.spct.f2014.pmor.janv.ma01.utils.context.BLIPDeviceEntity;
 import dk.pervasive.jcaf.ContextService;
 import dk.pervasive.jcaf.Entity;
 import dk.pervasive.jcaf.RemoteContextClient;
-import dk.pervasive.jcaf.entity.GenericEntity;
 import dk.pervasive.jcaf.item.Location;
 import dk.pervasive.jcaf.relationship.Located;
 import dk.pervasive.jcaf.util.AbstractMonitor;
@@ -191,14 +191,8 @@ public class BLIPDeviceMonitor extends AbstractMonitor {
 			// Is the Entity currently present in the ContextService?
 			if (entity == null) {
 				// Not present, we need to add a new entity
-				/*
-				 * TODO consider creating a subclass of GenericEntity. In
-				 * essence this is not needed unless we want to query the
-				 * ContextService for context information on a "per Entity type"
-				 * basis.
-				 */
 				this.getContextService().addEntity(
-						new GenericEntity(this.deviceId));
+						new BLIPDeviceEntity(this.deviceId));
 			}
 			// Entity should be present now, so we add the location information.
 			this.addLocationContextItem(device.getLocation());

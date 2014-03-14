@@ -8,5 +8,6 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/Utilities/gson-2.2.4-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="jcaf.v15.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

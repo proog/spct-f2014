@@ -7,6 +7,9 @@ public class TriggerMessage {
 	public static final String deviceIdSpecifier = "deviceId";
 	public static final String nameSpecifier = "name";
 	
+	public static final String startAction = "start";
+	public static final String stopAction = "stop";
+	
 	private static Gson gson = new Gson();
 	
 	private String action = "";
