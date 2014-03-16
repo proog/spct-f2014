@@ -3,6 +3,7 @@ package dk.itu.spct.f2014.ma01.pmor.janv.androidapp;
 import dk.itu.spct.f2014.ma01.pmor.janv.androidapp.network.TriggerServerClient;
 import android.os.Bundle;
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
@@ -31,7 +32,7 @@ public class MainActivity extends Activity {
 			args[1] = "3345";
 			args[2] = String.format(
 					"{ \"%s\":\"%s\", \"%s\":\"%s\", \"%s\":\"%s\" }",
-					"action", "start", "name", "janus", "deviceId", "123456789123");
+					"action", "start", "name", "janus", "deviceId", MainActivity.this.getBluetoothId());
 			Toast.makeText(MainActivity.this, "Sending: " + args[2],
 					Toast.LENGTH_LONG).show();
 			client.execute(args);
@@ -73,5 +74,16 @@ public class MainActivity extends Activity {
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
-
+	
+	/**
+	 * Get the Bluetooth ID of this device.
+	 * @return The Bluetooth ID or null if this device does not support Bluetooth.
+	 */
+	private String getBluetoothId() {
+		BluetoothAdapter ba = BluetoothAdapter.getDefaultAdapter();
+		if(ba == null) {
+			return null;
+		}
+		return ba.getAddress();
+	}
 }
