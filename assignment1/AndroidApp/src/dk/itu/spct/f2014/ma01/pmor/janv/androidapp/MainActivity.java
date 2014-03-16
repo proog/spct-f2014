@@ -7,6 +7,7 @@ import dk.itu.spct.f2014.ma01.pmor.janv.androidapp.network.TriggerServerMessage;
 import android.os.Bundle;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
@@ -55,8 +56,7 @@ public class MainActivity extends Activity {
 					TriggerServerMessage.ACTION_START, usersName,
 					MainActivity.this.getBluetoothId());
 			String json = new Gson().toJson(msg);
-			Toast.makeText(MainActivity.this, "Sending: " + json,
-					Toast.LENGTH_LONG).show();
+			Log.d(MainActivity.class.getSimpleName(), "Sending: " + json);
 			client.execute(host, port, json);
 			// Turn on Bluetooth such that BLIP can detect this device.
 			MainActivity.this.toggleBluetooth(true);
