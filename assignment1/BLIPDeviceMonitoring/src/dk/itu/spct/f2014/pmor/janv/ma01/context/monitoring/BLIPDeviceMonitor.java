@@ -38,6 +38,12 @@ import dk.pervasive.jcaf.util.AbstractMonitor;
 public class BLIPDeviceMonitor extends AbstractMonitor {
 
 	/**
+	 * Used as location string when a device is not found (i.e. its entity
+	 * representation should be removed).
+	 */
+	public static final String LOCATION_UNKNOWN = "LOCATION_UNKNOWN";
+
+	/**
 	 * Generated serial version UID.
 	 */
 	private static final long serialVersionUID = -1318891287337945814L;
@@ -120,6 +126,12 @@ public class BLIPDeviceMonitor extends AbstractMonitor {
 				 * system (using a "not found counter" with a threshold) in
 				 * order to compensate for the instability of the BLIP system.
 				 */
+				/*
+				 * Fire context changed with unknown location to allow listeners
+				 * to respond to the device being removed from the
+				 * ContextService.
+				 */
+				this.addLocationContextItem(LOCATION_UNKNOWN);
 				// Remove the entity from the ContextService
 				this.removeEntity();
 			}
@@ -158,6 +170,12 @@ public class BLIPDeviceMonitor extends AbstractMonitor {
 					// Device not found in BLIP system.
 					boolean remove = ++notFoundCount >= notFoundThreshold;
 					if (remove) {
+						/*
+						 * Fire context changed with unknown location to allow
+						 * listeners to respond to the device being removed from
+						 * the ContextService.
+						 */
+						this.addLocationContextItem(LOCATION_UNKNOWN);
 						// Remove the entity from the ContextService.
 						this.removeEntity();
 						// Reset counter.
@@ -293,8 +311,9 @@ public class BLIPDeviceMonitor extends AbstractMonitor {
 			/*
 			 * TODO: Handle error: logging?
 			 */
-			System.err.print(this.getClass().getSimpleName()
-					+ " end lifecycle: could remove self at ContextService");
+			System.err
+					.print(this.getClass().getSimpleName()
+							+ " end lifecycle: error when attempting to remove self from ContextService");
 			e.printStackTrace();
 		}
 	}
