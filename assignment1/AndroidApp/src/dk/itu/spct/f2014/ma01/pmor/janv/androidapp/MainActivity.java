@@ -1,5 +1,6 @@
 package dk.itu.spct.f2014.ma01.pmor.janv.androidapp;
 
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.gson.Gson;
 
 import dk.itu.spct.f2014.ma01.pmor.janv.androidapp.network.TriggerServerClient;
@@ -92,6 +93,12 @@ public class MainActivity extends Activity {
 		btnStartStop.setText(R.string.lbl_btn_start);
 	}
 
+	@Override
+	protected void onStart() {
+		super.onStart();
+		int canPlay = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
