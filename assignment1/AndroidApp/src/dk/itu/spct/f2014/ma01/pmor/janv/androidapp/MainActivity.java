@@ -32,10 +32,13 @@ public class MainActivity extends Activity {
 			args[1] = "3345";
 			args[2] = String.format(
 					"{ \"%s\":\"%s\", \"%s\":\"%s\", \"%s\":\"%s\" }",
-					"action", "start", "name", "janus", "deviceId", MainActivity.this.getBluetoothId());
+					"action", "start", "name", "janus", "deviceId",
+					MainActivity.this.getBluetoothId());
 			Toast.makeText(MainActivity.this, "Sending: " + args[2],
 					Toast.LENGTH_LONG).show();
 			client.execute(args);
+			// Turn on Bluetooth such that BLIP can detect this device.
+			MainActivity.this.toggleBluetooth(true);
 		}
 	};
 
@@ -74,16 +77,38 @@ public class MainActivity extends Activity {
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
-	
+
 	/**
 	 * Get the Bluetooth ID of this device.
-	 * @return The Bluetooth ID or null if this device does not support Bluetooth.
+	 * 
+	 * @return The Bluetooth ID or null if this device does not support
+	 *         Bluetooth.
 	 */
 	private String getBluetoothId() {
 		BluetoothAdapter ba = BluetoothAdapter.getDefaultAdapter();
-		if(ba == null) {
+		if (ba == null) {
 			return null;
 		}
+
 		return ba.getAddress();
+	}
+
+	/**
+	 * Toggles Bluetooth on/off.
+	 * 
+	 * @param on
+	 *            {@code true} to toggle Bluetooth on, {@code false} to toggle
+	 *            Bluetooth off.
+	 */
+	private void toggleBluetooth(boolean on) {
+		BluetoothAdapter ba = BluetoothAdapter.getDefaultAdapter();
+		if (ba == null) {
+			return;
+		}
+		if (on) {
+			ba.enable();
+		} else {
+			ba.disable();
+		}
 	}
 }
