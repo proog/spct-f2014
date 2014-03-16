@@ -1,10 +1,12 @@
 package dk.itu.spct.f2014.ma01.pmor.janv.androidapp;
 
+import dk.itu.spct.f2014.ma01.pmor.janv.androidapp.network.TriggerServerClient;
 import android.os.Bundle;
 import android.app.Activity;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
@@ -22,6 +24,17 @@ public class MainActivity extends Activity {
 			btnOnStart.setText(R.string.lbl_btn_stop);
 			// Change button behavior to "stop tracking"
 			btnOnStart.setOnClickListener(MainActivity.this.btnOnStopListener);
+
+			TriggerServerClient client = new TriggerServerClient();
+			String[] args = new String[3];
+			args[0] = "localhost";
+			args[1] = "3345";
+			args[2] = String.format(
+					"{ \"%s\":\"%s\", \"%s\":\"%s\", \"%s\":\"%s\" }",
+					"action", "start", "name", "janus", "id", "123456789123");
+			Toast.makeText(MainActivity.this, "Sending: " + args[2],
+					Toast.LENGTH_LONG).show();
+			client.execute();
 		}
 	};
 
