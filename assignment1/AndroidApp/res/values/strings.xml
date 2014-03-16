@@ -6,5 +6,7 @@
     <string name="lbl_enter_name">Enter your name</string>
     <string name="lbl_btn_start">Start tracking</string>
     <string name="lbl_btn_stop">Stop tracking</string>
-    
+    <string name="toast_name_missing">Please enter your name.</string>
+    <string name="toast_bluetooth_not_supported">Device does not support Bluetooth. BLIP tracking not possible.</string>
+
 </resources>

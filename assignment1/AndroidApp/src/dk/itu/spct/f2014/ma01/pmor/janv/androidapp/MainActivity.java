@@ -7,17 +7,36 @@ import android.bluetooth.BluetoothAdapter;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
+	private static final String TRIGGER_SERVER_HOST_ADDRESS = "172.20.10.3";
+	
+	private static final String TRIGGER_SERVER_PORT = "3345";
+	
 	/**
 	 * Listener to be invoked when button is in "Start tracking" mode.
 	 */
 	private final View.OnClickListener btnOnStartListener = new View.OnClickListener() {
 
+
+		
 		@Override
 		public void onClick(View v) {
+			if(MainActivity.this.getBluetoothId() == null) {
+				Toast.makeText(MainActivity.this, R.string.toast_bluetooth_not_supported, Toast.LENGTH_SHORT).show();
+				return;
+			}
+			EditText txtName = (EditText) MainActivity.this
+					.findViewById(R.id.txtName);
+			String usersName = txtName.getText().toString();
+			if (usersName.length() < 1) {
+				Toast.makeText(MainActivity.this, R.string.toast_name_missing,
+						Toast.LENGTH_SHORT).show();
+				return;
+			}
 			// TODO outline:
 			// 1) begin monitoring position using GPS.
 			// 2) change button functionality to "Stop tracking"
@@ -28,11 +47,11 @@ public class MainActivity extends Activity {
 
 			TriggerServerClient client = new TriggerServerClient();
 			String[] args = new String[3];
-			args[0] = "172.20.10.3";
-			args[1] = "3345";
+			args[0] = MainActivity.TRIGGER_SERVER_HOST_ADDRESS;
+			args[1] =  MainActivity.TRIGGER_SERVER_PORT;
 			args[2] = String.format(
 					"{ \"%s\":\"%s\", \"%s\":\"%s\", \"%s\":\"%s\" }",
-					"action", "start", "name", "janus", "deviceId",
+					"action", "start", "name", usersName, "deviceId",
 					MainActivity.this.getBluetoothId());
 			Toast.makeText(MainActivity.this, "Sending: " + args[2],
 					Toast.LENGTH_LONG).show();
