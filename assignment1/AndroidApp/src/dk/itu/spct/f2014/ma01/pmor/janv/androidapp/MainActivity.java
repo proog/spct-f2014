@@ -1,6 +1,9 @@
 package dk.itu.spct.f2014.ma01.pmor.janv.androidapp;
 
+import com.google.gson.Gson;
+
 import dk.itu.spct.f2014.ma01.pmor.janv.androidapp.network.TriggerServerClient;
+import dk.itu.spct.f2014.ma01.pmor.janv.androidapp.network.TriggerServerMessage;
 import android.os.Bundle;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -13,20 +16,20 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
 
 	private static final String TRIGGER_SERVER_HOST_ADDRESS = "172.20.10.3";
-	
+
 	private static final String TRIGGER_SERVER_PORT = "3345";
-	
+
 	/**
 	 * Listener to be invoked when button is in "Start tracking" mode.
 	 */
 	private final View.OnClickListener btnOnStartListener = new View.OnClickListener() {
 
-
-		
 		@Override
 		public void onClick(View v) {
-			if(MainActivity.this.getBluetoothId() == null) {
-				Toast.makeText(MainActivity.this, R.string.toast_bluetooth_not_supported, Toast.LENGTH_SHORT).show();
+			if (MainActivity.this.getBluetoothId() == null) {
+				Toast.makeText(MainActivity.this,
+						R.string.toast_bluetooth_not_supported,
+						Toast.LENGTH_SHORT).show();
 				return;
 			}
 			EditText txtName = (EditText) MainActivity.this
@@ -46,16 +49,15 @@ public class MainActivity extends Activity {
 			btnOnStart.setOnClickListener(MainActivity.this.btnOnStopListener);
 
 			TriggerServerClient client = new TriggerServerClient();
-			String[] args = new String[3];
-			args[0] = MainActivity.TRIGGER_SERVER_HOST_ADDRESS;
-			args[1] =  MainActivity.TRIGGER_SERVER_PORT;
-			args[2] = String.format(
-					"{ \"%s\":\"%s\", \"%s\":\"%s\", \"%s\":\"%s\" }",
-					"action", "start", "name", usersName, "deviceId",
+			String host = MainActivity.TRIGGER_SERVER_HOST_ADDRESS;
+			String port = MainActivity.TRIGGER_SERVER_PORT;
+			TriggerServerMessage msg = new TriggerServerMessage(
+					TriggerServerMessage.ACTION_START, usersName,
 					MainActivity.this.getBluetoothId());
-			Toast.makeText(MainActivity.this, "Sending: " + args[2],
+			String json = new Gson().toJson(msg);
+			Toast.makeText(MainActivity.this, "Sending: " + json,
 					Toast.LENGTH_LONG).show();
-			client.execute(args);
+			client.execute(host, port, json);
 			// Turn on Bluetooth such that BLIP can detect this device.
 			MainActivity.this.toggleBluetooth(true);
 		}
