@@ -50,7 +50,7 @@ public class BLIPDeviceMonitor extends AbstractMonitor {
 	/**
 	 * ID of the device monitored by this {@code BLIPDeviceMonitor}.
 	 */
-	private final String deviceId;
+	private final BLIPDeviceEntity entity;
 
 	/**
 	 * The time (in milliseconds) between each entity update sent from this
@@ -92,10 +92,10 @@ public class BLIPDeviceMonitor extends AbstractMonitor {
 	public BLIPDeviceMonitor(
 			String service_uri,
 			IBLIPDeviceUpdateProvider<? extends IBLIPDeviceDataContract> blipService,
-			String deviceId) throws RemoteException {
+			BLIPDeviceEntity entity) throws RemoteException {
 		super(service_uri);
 		this.blipService = Objects.requireNonNull(blipService);
-		this.deviceId = Objects.requireNonNull(deviceId);
+		this.entity = Objects.requireNonNull(entity);
 		// Register self as monitor of location changes.
 		this.getContextService().addContextClient(
 				RemoteContextClient.TYPE_MONITOR, Location.class, this);
@@ -106,7 +106,7 @@ public class BLIPDeviceMonitor extends AbstractMonitor {
 		try {
 			// Get device from BLIP system
 			IBLIPDeviceDataContract device = this.blipService
-					.getDeviceUpdate(this.deviceId);
+					.getDeviceUpdate(this.entity.getId());
 			if (device != null) {
 				// Device found in BLIP system.
 				this.onDeviceFound(device);
@@ -150,7 +150,7 @@ public class BLIPDeviceMonitor extends AbstractMonitor {
 		while (this.isAlive()) {
 			try {
 				IBLIPDeviceDataContract device = this.blipService
-						.getDeviceUpdate(this.deviceId);
+						.getDeviceUpdate(this.entity.getId());
 				if (device != null) {
 					// Device found in BLIP system.
 					this.onDeviceFound(device);
@@ -223,16 +223,16 @@ public class BLIPDeviceMonitor extends AbstractMonitor {
 	 *            Device data containing context information.
 	 */
 	private void onDeviceFound(IBLIPDeviceDataContract device) {
-		assert this.deviceId.equals(device.getTerminalId());
+		assert this.entity.getId().equals(device.getTerminalId());
 		Entity entity = null;
 		try {
 			// TODO is this call blocking? Figure out what to do if it isn't.
-			entity = this.getContextService().getEntity(this.deviceId);
+			entity = this.getContextService().getEntity(this.entity.getId());
 			// Is the Entity currently present in the ContextService?
 			if (entity == null) {
 				// Not present, we need to add a new entity
 				this.getContextService().addEntity(
-						new BLIPDeviceEntity(this.deviceId));
+						new BLIPDeviceEntity(this.entity.getId()));
 			}
 			// Entity should be present now, so we add the location information.
 			this.addLocationContextItem(device.getLocation());
@@ -266,7 +266,7 @@ public class BLIPDeviceMonitor extends AbstractMonitor {
 	 */
 	private void addLocationContextItem(String location) throws RemoteException {
 		Objects.requireNonNull(location);
-		this.getContextService().addContextItem(this.deviceId, new Located(),
+		this.getContextService().addContextItem(this.entity.getId(), new Located(),
 				new Location(location));
 	}
 
@@ -278,7 +278,7 @@ public class BLIPDeviceMonitor extends AbstractMonitor {
 	 *             If the RMI call to the {@link ContextService} fails.
 	 */
 	private void removeEntity() throws RemoteException {
-		this.getContextService().removeEntity(this.deviceId);
+		this.getContextService().removeEntity(this.entity.getId());
 	}
 
 	/**

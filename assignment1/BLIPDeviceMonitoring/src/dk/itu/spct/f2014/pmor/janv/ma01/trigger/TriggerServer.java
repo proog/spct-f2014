@@ -11,9 +11,11 @@ import java.lang.*;
 import dk.itu.spct.f2014.pmor.janv.ma01.blip.webservice.client.BLIPClient;
 import dk.itu.spct.f2014.pmor.janv.ma01.context.monitoring.BLIPDeviceMonitor;
 import dk.itu.spct.f2014.pmor.janv.ma01.utils.TriggerMessage;
+import dk.itu.spct.f2014.pmor.janv.ma01.utils.context.BLIPDeviceEntity;
 
 public class TriggerServer extends Thread {
 	public static final int PORT = 3345;
+	public static String contextServiceUri;
 	
 	/**
 	 * The timeout for the accept call in the listening loop.
@@ -102,7 +104,10 @@ public class TriggerServer extends Thread {
 			addMonitor(m);
 		}
 		else if(m.getAction().equalsIgnoreCase(TriggerMessage.stopAction)) {
-			monitors.get(m.getDeviceId());
+			String deviceId = m.getDeviceId();
+			BLIPDeviceMonitor monitor = monitors.get(deviceId);
+			monitor.stopMonitoring();
+			monitors.remove(deviceId);
 		}
 	}
 	
@@ -114,7 +119,8 @@ public class TriggerServer extends Thread {
 	private void addMonitor(TriggerMessage m) {
 		try {
 			BLIPClient client = new BLIPClient(BLIPClient.DEFAULT_BASE_URL);
-			BLIPDeviceMonitor monitor = new BLIPDeviceMonitor("service_uri", client, m.getDeviceId());
+			BLIPDeviceEntity entity = new BLIPDeviceEntity(m.getDeviceId(), m.getName());
+			BLIPDeviceMonitor monitor = new BLIPDeviceMonitor(contextServiceUri, client, entity);
 			Thread t = new Thread(monitor);
 			monitors.put(m.getDeviceId(), monitor);
 			t.start();
@@ -131,6 +137,12 @@ public class TriggerServer extends Thread {
 			ts.start();
 			Thread.sleep(5000);
 			ts.stopServer();*/
+			if(args.length != 1) {
+				System.out.println("Usage: java TriggerServer contextServiceUri");
+				System.exit(1);
+			}
+			
+			contextServiceUri = args[0];
 			new TriggerServer().startServer();
 		} catch (IOException e) {
 			e.printStackTrace();
