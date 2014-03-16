@@ -11,6 +11,7 @@ import java.lang.*;
 import dk.itu.spct.f2014.pmor.janv.ma01.blip.webservice.client.BLIPClient;
 import dk.itu.spct.f2014.pmor.janv.ma01.context.monitoring.BLIPDeviceMonitor;
 import dk.itu.spct.f2014.pmor.janv.ma01.utils.TriggerMessage;
+import dk.itu.spct.f2014.pmor.janv.ma01.utils.blip.webservice.BLIPDeviceUpdateProviderTestImpl;
 import dk.itu.spct.f2014.pmor.janv.ma01.utils.context.BLIPDeviceEntity;
 
 public class TriggerServer extends Thread {
@@ -97,6 +98,8 @@ public class TriggerServer extends Thread {
 	 * @param m The message
 	 */
 	public synchronized void messageReceived(TriggerMessage m) {
+		System.out.println("TriggerServer: message received: " + m.toString());
+		
 		for(MessageReceivedObserver o : observers)
 			o.messageReceived(m);
 		
@@ -118,7 +121,8 @@ public class TriggerServer extends Thread {
 	
 	private void addMonitor(TriggerMessage m) {
 		try {
-			BLIPClient client = new BLIPClient(BLIPClient.DEFAULT_BASE_URL);
+			//BLIPClient client = new BLIPClient(BLIPClient.DEFAULT_BASE_URL);
+			BLIPDeviceUpdateProviderTestImpl client = new BLIPDeviceUpdateProviderTestImpl();
 			BLIPDeviceEntity entity = new BLIPDeviceEntity(m.getDeviceId(), m.getName());
 			BLIPDeviceMonitor monitor = new BLIPDeviceMonitor(contextServiceUri, client, entity);
 			Thread t = new Thread(monitor);
@@ -132,11 +136,6 @@ public class TriggerServer extends Thread {
 
 	public static void main(String[] args) throws InterruptedException {
 		try {
-			/*TriggerServer ts = new TriggerServer();
-			ts.addObserver(new MessagePrinter());
-			ts.start();
-			Thread.sleep(5000);
-			ts.stopServer();*/
 			if(args.length != 1) {
 				System.out.println("Usage: java TriggerServer contextServiceUri");
 				System.exit(1);
@@ -144,6 +143,7 @@ public class TriggerServer extends Thread {
 			
 			contextServiceUri = args[0];
 			new TriggerServer().startServer();
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

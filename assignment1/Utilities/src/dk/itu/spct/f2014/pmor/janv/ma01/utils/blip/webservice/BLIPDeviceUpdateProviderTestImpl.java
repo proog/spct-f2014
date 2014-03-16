@@ -32,7 +32,7 @@ public class BLIPDeviceUpdateProviderTestImpl implements
 	@Override
 	public BLIPDevice getDeviceUpdate(String deviceId) throws IOException {
 		this.device.setLocation(this.testLocations[count]);
-		count++;
+		//count++;
 		// TODO add (modulo) check on count, i.e. keep cycling?
 		return this.device;
 	}

@@ -53,7 +53,7 @@ public class BLIPDeviceEntityListener extends AbstractContextClient implements E
 				if(!(contextItem instanceof Location))
 					return;
 				
-				String location = ((Location) contextItem).getLocation();
+				String location = ((Location) contextItem).getId();
 				boolean isInCurrentEntities = currentEntities.containsKey(deviceId);
 				boolean isInThisLocation = location.equals(displayLocation);
 				

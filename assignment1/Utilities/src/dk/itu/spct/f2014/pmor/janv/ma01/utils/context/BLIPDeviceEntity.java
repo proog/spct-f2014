@@ -24,4 +24,9 @@ public class BLIPDeviceEntity extends GenericEntity implements Serializable {
 	public String getName() {
 		return name;
 	}
+	
+	@Override
+	public String toString() {
+		return this.getName() + " (" + this.getId() + ")";
+	}
 }

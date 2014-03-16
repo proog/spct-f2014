@@ -249,8 +249,7 @@ public class BLIPDeviceMonitor extends AbstractMonitor {
 			// Is the Entity currently present in the ContextService?
 			if (entity == null) {
 				// Not present, we need to add a new entity
-				this.getContextService().addEntity(
-						new BLIPDeviceEntity(this.entity.getId()));
+				this.getContextService().addEntity(this.entity);
 			}
 			// Entity should be present now, so we add the location information.
 			this.addLocationContextItem(device.getLocation());
@@ -284,7 +283,7 @@ public class BLIPDeviceMonitor extends AbstractMonitor {
 	 */
 	private void addLocationContextItem(String location) throws RemoteException {
 		Objects.requireNonNull(location);
-		this.getContextService().addContextItem(this.entity.getId(), new Located(),
+		this.getContextService().addContextItem(this.entity.getId(), new Located(this.entity.getId()),
 				new Location(location));
 	}
 

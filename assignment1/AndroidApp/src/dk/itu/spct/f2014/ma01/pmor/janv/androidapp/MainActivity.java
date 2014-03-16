@@ -27,14 +27,14 @@ public class MainActivity extends Activity {
 
 			TriggerServerClient client = new TriggerServerClient();
 			String[] args = new String[3];
-			args[0] = "localhost";
+			args[0] = "172.20.10.3";
 			args[1] = "3345";
 			args[2] = String.format(
 					"{ \"%s\":\"%s\", \"%s\":\"%s\", \"%s\":\"%s\" }",
-					"action", "start", "name", "janus", "id", "123456789123");
+					"action", "start", "name", "janus", "deviceId", "123456789123");
 			Toast.makeText(MainActivity.this, "Sending: " + args[2],
 					Toast.LENGTH_LONG).show();
-			client.execute();
+			client.execute(args);
 		}
 	};
 
