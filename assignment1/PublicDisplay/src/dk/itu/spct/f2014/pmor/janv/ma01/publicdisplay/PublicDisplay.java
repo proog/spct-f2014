@@ -15,11 +15,10 @@ public class PublicDisplay extends JFrame {
 	private DefaultListModel<BLIPDeviceEntity> userListModel = new DefaultListModel<>();
 	private JLabel locationLabel = new JLabel("location");
 	private JLabel descriptionLabel = new JLabel("Users in ");
-	private BLIPDeviceEntityListener listener;
 	
-	public PublicDisplay(String serviceUri, String displayZone) {
+	public PublicDisplay(String displayZone) {
 		this.setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
-		this.setMinimumSize(new Dimension(800, 500));
+		this.setMinimumSize(new Dimension(500, 200));
 		this.locationLabel.setText(displayZone);
 		this.locationLabel.setFont(new Font(Font.DIALOG, Font.BOLD, 50));
 		this.descriptionLabel.setFont(new Font(Font.DIALOG, Font.PLAIN, 50));
@@ -34,16 +33,27 @@ public class PublicDisplay extends JFrame {
 		p.add(locationLabel);
 		this.add(p);
 		this.add(userList);
-		
-		this.listener = new BLIPDeviceEntityListener(serviceUri, this, displayZone);
 	}
 	
+	/**
+	 * Called when an entity enters this zone.
+	 * @param entity
+	 */
 	public void entityEnter(BLIPDeviceEntity entity) {
 		userListModel.addElement(entity);
 	}
 	
+	/**
+	 * Called when an entity leaves this zone.
+	 * @param entity
+	 */
 	public void entityLeave(BLIPDeviceEntity entity) {
-		userListModel.removeElement(entity);
+		for(int i = 0; i < userListModel.size(); i++) {
+			if(userListModel.get(i).getId().equals(entity.getId())) {
+				userListModel.remove(i);
+				break;
+			}
+		}
 	}
 
 	/**
@@ -55,7 +65,9 @@ public class PublicDisplay extends JFrame {
 			System.exit(1);
 		}
 		
-		PublicDisplay display = new PublicDisplay(args[0], args[1]);
+		PublicDisplay display = new PublicDisplay(args[1]);
+		new BLIPDeviceEntityListener(args[0], display, args[1]);
+		
 		display.setVisible(true);
 	}
 

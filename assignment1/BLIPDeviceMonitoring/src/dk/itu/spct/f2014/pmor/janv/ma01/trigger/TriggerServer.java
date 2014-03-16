@@ -53,10 +53,13 @@ public class TriggerServer extends Thread {
 	 * Makes the server start listening for incoming connections until <pre>stop()</pre> is called.
 	 */
 	public void startServer() {
+		System.out.println("TriggerServer: listening on port " + PORT);
 		while(!stop) {
 			try {
 				// wait for client to connect
 				Socket socket = serverSocket.accept();
+				
+				System.out.println("TriggerServer: accepted a connection");
 				
 				// start reading the message asynchronously from the client
 				Thread t = new TriggerServerThread(socket, this);
@@ -98,7 +101,7 @@ public class TriggerServer extends Thread {
 	 * @param m The message
 	 */
 	public synchronized void messageReceived(TriggerMessage m) {
-		System.out.println("TriggerServer: message received: " + m.toString());
+		System.out.println("TriggerServer: received " + m.toString());
 		
 		for(MessageReceivedObserver o : observers)
 			o.messageReceived(m);
@@ -143,7 +146,6 @@ public class TriggerServer extends Thread {
 			
 			contextServiceUri = args[0];
 			new TriggerServer().startServer();
-			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
