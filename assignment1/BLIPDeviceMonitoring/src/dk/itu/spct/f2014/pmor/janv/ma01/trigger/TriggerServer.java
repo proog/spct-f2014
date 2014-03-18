@@ -124,12 +124,15 @@ public class TriggerServer extends Thread {
 	
 	private void addMonitor(TriggerMessage m) {
 		try {
-			//BLIPClient client = new BLIPClient(BLIPClient.DEFAULT_BASE_URL);
-			BLIPDeviceUpdateProviderTestImpl client = new BLIPDeviceUpdateProviderTestImpl();
+			if(monitors.containsKey(m.getDeviceId()))
+				return; // monitor for this device already running
+			
+			BLIPClient client = new BLIPClient(BLIPClient.DEFAULT_BASE_URL);
+			//BLIPDeviceUpdateProviderTestImpl client = new BLIPDeviceUpdateProviderTestImpl();
 			BLIPDeviceEntity entity = new BLIPDeviceEntity(m.getDeviceId(), m.getName());
 			BLIPDeviceMonitor monitor = new BLIPDeviceMonitor(contextServiceUri, client, entity);
-			Thread t = new Thread(monitor);
 			monitors.put(m.getDeviceId(), monitor);
+			Thread t = new Thread(monitor);
 			t.start();
 		} catch (RemoteException e) {
 			System.out.println("Could not add a new monitor.");

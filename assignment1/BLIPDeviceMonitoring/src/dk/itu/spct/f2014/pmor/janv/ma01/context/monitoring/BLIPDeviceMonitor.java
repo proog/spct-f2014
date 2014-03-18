@@ -109,6 +109,8 @@ public class BLIPDeviceMonitor extends AbstractMonitor {
 
 	@Override
 	public void monitor(String entityId) throws RemoteException {
+		System.out.println("monitor() called");
+		
 		try {
 			// Get device from BLIP system
 			IBLIPDeviceDataContract device = this.blipService
@@ -166,6 +168,7 @@ public class BLIPDeviceMonitor extends AbstractMonitor {
 				if (device != null) {
 					// Device found in BLIP system.
 					this.onDeviceFound(device);
+					notFoundCount = 0;
 				} else {
 					// Device not found in BLIP system.
 					boolean remove = ++notFoundCount >= notFoundThreshold;
@@ -180,18 +183,10 @@ public class BLIPDeviceMonitor extends AbstractMonitor {
 						this.removeEntity();
 						// Reset counter.
 						notFoundCount = 0;
+						
+						System.out.println("Blip monitor: removing entity");
 					}
 				}
-				// Sleep till next update
-				Thread.sleep(this.updateInterval);
-			} catch (InterruptedException e) {
-				/*
-				 * TODO: Handle error: logging? Also, is this thread interrupted
-				 * if there is a remote call to monitor(String)?
-				 */
-				System.err.println(this.getClass().getSimpleName()
-						+ " was interrupted in run()");
-				e.printStackTrace();
 			} catch (RemoteException e) {
 				/*
 				 * TODO: Handle error: logging?
@@ -211,6 +206,19 @@ public class BLIPDeviceMonitor extends AbstractMonitor {
 								+ ": "
 								+ e.getClass().getSimpleName()
 								+ " occurred in run() - could not fetch data from BLIP system.");
+				e.printStackTrace();
+			}
+			
+			try {
+				// Sleep till next update
+				Thread.sleep(this.updateInterval);
+			} catch (InterruptedException e) {
+				/*
+				 * TODO: Handle error: logging? Also, is this thread interrupted
+				 * if there is a remote call to monitor(String)?
+				 */
+				System.err.println(this.getClass().getSimpleName()
+						+ " was interrupted in run()");
 				e.printStackTrace();
 			}
 		}

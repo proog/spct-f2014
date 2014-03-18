@@ -44,18 +44,21 @@ public class BLIPDeviceEntityListener extends AbstractContextClient implements E
 
 	@Override
 	public void contextChanged(final ContextEvent arg0) {
+		System.out.println("Event: " + arg0.getEventType() + " " + arg0.getEventTypeText());
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				BLIPDeviceEntity entity = (BLIPDeviceEntity) arg0.getEntity();
 				String deviceId = entity.getId();
 				ContextItem contextItem = arg0.getItem();
-				if(!(contextItem instanceof Location))
+				if(!(contextItem instanceof Location)) {
+					System.out.println("Context item: " + contextItem.getClass().getSimpleName());
 					return;
+				}
 				
 				String location = ((Location) contextItem).getId();
 				boolean isInCurrentEntities = currentEntities.containsKey(deviceId);
-				boolean isInThisLocation = location.equals(displayLocation);
+				boolean isInThisLocation = location.contains(displayLocation);
 				
 				if(!isInCurrentEntities && isInThisLocation) {
 					// add entity

@@ -3,8 +3,12 @@ package dk.itu.spct.f2014.pmor.janv.ma01.utils.blip.model;
 import java.util.Objects;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
+import com.google.gson.stream.JsonReader;
 
 /**
  * A class used to wrap the JSON that is returned by the BLIP REST web service
@@ -54,6 +58,10 @@ public class BLIPDevice implements IBLIPDeviceDataContract {
 		 * default values. Needs more thorough testing.
 		 */
 		try {
+			JsonElement elem = new JsonParser().parse(json);
+			if(!elem.isJsonObject() || elem.getAsJsonObject().get("terminal-id") == null)
+				return null;
+			
 			return new Gson().fromJson(Objects.requireNonNull(json),
 					BLIPDevice.class);
 		}

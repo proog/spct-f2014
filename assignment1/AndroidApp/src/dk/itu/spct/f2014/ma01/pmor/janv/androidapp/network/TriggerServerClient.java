@@ -9,6 +9,8 @@ import java.net.UnknownHostException;
 import android.os.AsyncTask;
 
 public class TriggerServerClient extends AsyncTask<String, Void, Void> {
+	public static final String TRIGGER_SERVER_HOST_ADDRESS = "172.20.10.3";
+	public static final String TRIGGER_SERVER_PORT = "3345";
 
 	@Override
 	protected Void doInBackground(String... params) {
