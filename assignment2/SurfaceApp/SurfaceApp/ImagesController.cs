@@ -1,19 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Http;
+﻿using System.Web.Http;
+using System.Net.Http;
+using System.IO;
 
 namespace SurfaceApp.Network
 {
     public class ImagesController : ApiController
     {
 
-        // GET api/values/5 
-        public string Get(int id)
+        /// <summary>
+        /// Get a specific image.
+        /// </summary>
+        /// <param name="id">The ID of the image to be downloaded.</param>
+        /// <returns></returns>
+        public HttpResponseMessage Get(string id)
         {
-            return "value";
+            var resp = new HttpResponseMessage();
+            resp.StatusCode = System.Net.HttpStatusCode.OK;
+            resp.Content = new StreamContent(new FileStream("./Resources/icon.png", FileMode.Open));
+            return resp;
         }
 
         // POST api/values 
@@ -29,6 +33,7 @@ namespace SurfaceApp.Network
         // DELETE api/values/5 
         public void Delete(int id)
         {
+
         }
 
     }
