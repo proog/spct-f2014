@@ -1,10 +1,12 @@
-﻿using Owin;
+﻿using Microsoft.Owin;
+using Owin;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web.Http;
 
+[assembly: OwinStartup(typeof(SurfaceApp.Network.ImageServerConfig))]
 namespace SurfaceApp.Network
 {
     public class ImageServerConfig
