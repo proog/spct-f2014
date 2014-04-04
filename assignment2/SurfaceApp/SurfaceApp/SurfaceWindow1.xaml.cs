@@ -38,7 +38,9 @@ namespace SurfaceApp
             //System.Threading.Thread.Sleep(2500);
             var tester = new ImageUploadTester();
             tester.StartUpload();
-        }
+            new ImageServer().Start();
+			new SignalR().Start();
+		}
 
         /// <summary>
         /// Occurs when the window is about to close. 

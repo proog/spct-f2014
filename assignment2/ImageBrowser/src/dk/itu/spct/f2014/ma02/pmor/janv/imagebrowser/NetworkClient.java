@@ -21,9 +21,14 @@ public class NetworkClient {
 		
 		Platform.loadPlatformComponent(new AndroidPlatformComponent());
 		HubConnection con = new HubConnection(host);
-		HubProxy hub = con.createHubProxy("pmor_janv");
+		HubProxy hub = con.createHubProxy("PhoneHub");
+		hub.invoke("SendIdentification", new Byte((byte)5));
 		
 		hub.subscribe(this);
+	}
+	
+	public void SendIdentification(final byte tagValue) {
+		
 	}
 	
 	/**

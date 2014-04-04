@@ -33,6 +33,8 @@ public class MainActivity extends Activity {
 		}
 		
 		reloadImages();
+		
+		NetworkClient client = new NetworkClient("http://10.25.230.167:8080");
 	}
 	
 	private void reloadImages() {
