@@ -15,6 +15,7 @@ using Microsoft.Surface;
 using Microsoft.Surface.Presentation;
 using Microsoft.Surface.Presentation.Controls;
 using Microsoft.Surface.Presentation.Input;
+using SurfaceApp.Network;
 
 namespace SurfaceApp {
 	/// <summary>
@@ -29,6 +30,7 @@ namespace SurfaceApp {
 
 			// Add handlers for window availability events
 			AddWindowAvailabilityHandlers();
+            new ImageServer().Start();
 		}
 
 		/// <summary>
