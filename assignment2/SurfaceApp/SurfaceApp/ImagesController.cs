@@ -1,28 +1,27 @@
 ﻿using System.Web.Http;
 using System.Net.Http;
 using System.IO;
-using System.Web;
+using System.Configuration;
 
 namespace SurfaceApp.Network
 {
     public class ImagesController : ApiController
     {
 
+        public ImagesController()
+        {
+            this.InitUploadDir();
+        }
+
         /// <summary>
         /// Get a specific image.
         /// </summary>
         /// <param name="id">The ID of the image to be downloaded.</param>
-        /// <returns></returns>
+        /// <returns>A response containing the image as payload, or an error response if no image was found for the given id.</returns>
         public HttpResponseMessage Get(string id)
         {
-            //string appDir = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
             var resp = new HttpResponseMessage();
-            //var virPath = System.Web.Hosting.HostingEnvironment.ApplicationVirtualPath;
-            //var physPath = System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath;
-            //var mappedPath = System.Web.Hosting.HostingEnvironment.MapPath("~/Resources");
-            //string imgPath = appDir + "uploads\\images\\" + id;
-
-            string imgPath = "/Resources/uploads/images/" + id;
+            var imgPath = this.ImageUploadPath + id;
             var found = File.Exists(imgPath);
             if (found)
             {
@@ -50,6 +49,28 @@ namespace SurfaceApp.Network
         // DELETE api/values/5 
         public void Delete(int id)
         {
+
+        }
+
+        private void InitUploadDir()
+        {
+
+            // Create directory if not yet initialized.
+            if (!Directory.Exists(this.ImageUploadPath))
+            {
+                Directory.CreateDirectory(this.ImageUploadPath);
+            }
+
+        }
+
+        private string ImageUploadPath
+        {
+            get
+            {
+                string appDir = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
+                string upDir = appDir + ConfigurationManager.AppSettings["img_upload_dir"];
+                return upDir;
+            }
 
         }
 

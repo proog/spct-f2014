@@ -23,7 +23,6 @@ namespace SurfaceApp.Network
                 routeTemplate: "{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
-
             appBuilder.UseWebApi(config);
         }
          
