@@ -8,11 +8,6 @@ namespace SurfaceApp.Network
     public class ImagesController : ApiController
     {
 
-        public ImagesController()
-        {
-            this.InitUploadDir();
-        }
-
         /// <summary>
         /// Get a specific image.
         /// </summary>
@@ -21,7 +16,7 @@ namespace SurfaceApp.Network
         public HttpResponseMessage Get(string id)
         {
             var resp = new HttpResponseMessage();
-            var imgPath = this.ImageUploadPath + id;
+            var imgPath = ImageServer.ImageUploadPath + id;
             var found = File.Exists(imgPath);
             if (found)
             {
@@ -51,28 +46,5 @@ namespace SurfaceApp.Network
         {
 
         }
-
-        private void InitUploadDir()
-        {
-
-            // Create directory if not yet initialized.
-            if (!Directory.Exists(this.ImageUploadPath))
-            {
-                Directory.CreateDirectory(this.ImageUploadPath);
-            }
-
-        }
-
-        private string ImageUploadPath
-        {
-            get
-            {
-                string appDir = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
-                string upDir = appDir + ConfigurationManager.AppSettings["img_upload_dir"];
-                return upDir;
-            }
-
-        }
-
     }
 }

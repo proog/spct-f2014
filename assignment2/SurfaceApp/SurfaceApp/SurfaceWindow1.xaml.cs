@@ -30,7 +30,8 @@ namespace SurfaceApp {
 
 			// Add handlers for window availability events
 			AddWindowAvailabilityHandlers();
-            new ImageServer().Start();
+            // Start the REST web service.
+            ImageServer.GetInstance().Start();
 		}
 
 		/// <summary>
