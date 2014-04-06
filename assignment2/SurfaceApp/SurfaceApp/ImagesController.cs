@@ -57,7 +57,7 @@ namespace SurfaceApp.Network
                 Task<byte[]> readBuffer = file.ReadAsByteArrayAsync();
                 readBuffer.Wait();
                 byte[] buffer = readBuffer.Result;
-                ImageServer.GetInstance().SaveImage(Image.FromStream(new MemoryStream(buffer)), deviceId);
+                ImageServer.GetInstance().SaveImage(Image.FromStream(new MemoryStream(buffer)), deviceId, fileName);
             }
 
             return Request.CreateResponse(HttpStatusCode.OK);

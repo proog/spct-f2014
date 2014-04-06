@@ -100,13 +100,12 @@ namespace SurfaceApp.Network
             }
         }
 
-        public void SaveImage(Image img, int deviceId)
+        public void SaveImage(Image img, int deviceId, string imgFileName)
         {
-            var format = this.GetImageFormat(img);
-
+            //var format = this.GetImageFormat(img);
             var path = this.InitDeviceUploadDir(deviceId);
             // TODO create and store ImageInfo.
-            string fileName = String.Format("{0}{1}.{2}", path, Guid.NewGuid(), format.ToString());
+            string fileName = String.Format("{0}{1}", path, imgFileName);
             img.Save(fileName, img.RawFormat);
         }
 
