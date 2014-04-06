@@ -9,6 +9,7 @@ using System;
 
 namespace SurfaceApp.Network
 {
+    [RoutePrefix("images/{deviceId:int}")]
     public class ImagesController : ApiController
     {
 
@@ -17,10 +18,12 @@ namespace SurfaceApp.Network
         /// </summary>
         /// <param name="id">The ID of the image to be downloaded.</param>
         /// <returns>A response containing the image as payload, or an error response if no image was found for the given id.</returns>
-        public HttpResponseMessage Get(string id)
+        [Route("{imageFileName}")]
+        [HttpGet]
+        public HttpResponseMessage Get(int deviceId, string imageFileName)
         {
             var resp = new HttpResponseMessage();
-            var imgPath = ImageServer.ImageUploadPath + id;
+            var imgPath = ImageServer.GetDeviceUploadPath(deviceId) + imageFileName;
             var found = File.Exists(imgPath);
             if (found)
             {
@@ -34,8 +37,10 @@ namespace SurfaceApp.Network
             }
             return resp;
         }
-
-        public HttpResponseMessage Post()
+        
+        [Route("")]
+        [HttpPost]
+        public HttpResponseMessage Post(int deviceId)
         {
             if (!Request.Content.IsMimeMultipartContent())
             {
@@ -52,7 +57,7 @@ namespace SurfaceApp.Network
                 Task<byte[]> readBuffer = file.ReadAsByteArrayAsync();
                 readBuffer.Wait();
                 byte[] buffer = readBuffer.Result;
-                ImageServer.GetInstance().SaveImage(Image.FromStream(new MemoryStream(buffer)));
+                ImageServer.GetInstance().SaveImage(Image.FromStream(new MemoryStream(buffer)), deviceId);
             }
 
             return Request.CreateResponse(HttpStatusCode.OK);
@@ -61,6 +66,7 @@ namespace SurfaceApp.Network
         // PUT api/values/5 
         public void Put(int id, [FromBody]string value)
         {
+
         }
 
         // DELETE api/values/5 

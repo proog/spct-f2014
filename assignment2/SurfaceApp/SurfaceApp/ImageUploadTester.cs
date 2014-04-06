@@ -30,21 +30,8 @@ namespace SurfaceApp.Network
                     delegate(object o, DoWorkEventArgs args)
                     {
                         WebClient client = new WebClient();
-                        string url = ImageServer.ServerBaseAddress + "/images";
-                        client.UploadFile(address: url, fileName: TestDir + TEST_IMG_FILE_NAME);
-                        //using (var client = new HttpClient())
-                        //using (var content = new MultipartFormDataContent())
-                        //{
-                        //    client.BaseAddress = new Uri(ImageServer.ServerBaseAddress);
-                        //    var fileContent1 = new ByteArrayContent(File.ReadAllBytes(TestDir + TEST_IMG_FILE_NAME));
-                        //    fileContent1.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
-                        //    {
-                        //        FileName = TEST_IMG_FILE_NAME
-                        //    };
-                        //    content.Add(fileContent1);
-                            
-                        //    var result = client.PostAsync("/images", content).Result;
-                        //}
+                        string url = ImageServer.ServerBaseAddress + "/images/1337";
+                        client.UploadFile(address: url, method: "POST", fileName: TestDir + TEST_IMG_FILE_NAME);
                     }
                 );
         }

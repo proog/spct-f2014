@@ -14,8 +14,7 @@ using System.Threading.Tasks;
 namespace SurfaceApp.Network
 {
     /// <summary>
-    /// Simple utility class used to start the REST service.
-    /// 
+    /// The REST image server.
     /// </summary>
     public class ImageServer
     {
@@ -101,11 +100,13 @@ namespace SurfaceApp.Network
             }
         }
 
-        public void SaveImage(Image img)
+        public void SaveImage(Image img, int deviceId)
         {
             var format = this.GetImageFormat(img);
+
+            var path = this.InitDeviceUploadDir(deviceId);
             // TODO create and store ImageInfo.
-            string fileName = String.Format("{0}{1}.{2}", ImageUploadPath, Guid.NewGuid(), format.ToString());
+            string fileName = String.Format("{0}{1}.{2}", path, Guid.NewGuid(), format.ToString());
             img.Save(fileName, img.RawFormat);
         }
 
@@ -132,6 +133,11 @@ namespace SurfaceApp.Network
             }
         }
 
+        public static string GetDeviceUploadPath(int deviceId)
+        {
+            return ImageUploadPath + deviceId + "\\";
+        }
+
         private ImageFormat GetImageFormat(Image img)
         {
             ImageFormat format = null;
@@ -147,6 +153,22 @@ namespace SurfaceApp.Network
                 // TODO better default?
                 format = ImageFormat.Wmf;
             return format;
+        }
+
+        /// <summary>
+        /// Initializes a directory for a given device id where pictures from that device is to be stored. If the directory is already present, no work is done.
+        /// </summary>
+        /// <returns>The path to the device upload dir.</returns>
+        private string InitDeviceUploadDir(int deviceId)
+        {
+            rwLock.EnterWriteLock();
+            string path = ImageUploadPath + deviceId + "\\";
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            rwLock.ExitWriteLock();
+            return path;
         }
 
         /// <summary>
