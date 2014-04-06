@@ -14,12 +14,11 @@ public class NetworkClient {
 		this.serverIp = ip;
 	}
 	
-	public void connectSignalR() {
+	public void connectSignalR(byte tag) {
 		Platform.loadPlatformComponent(new AndroidPlatformComponent());
 		HubConnection con = new HubConnection("http://" + serverIp + ":" + signalrPort + "/signalr");
 		HubProxy hub = con.createHubProxy("PhoneHub");
-		hub.invoke("SendIdentification", new Byte((byte)5));
-		
 		hub.subscribe(new PhoneHubSubscriptionHandler());
+		hub.invoke("SendTagId", tag);
 	}
 }

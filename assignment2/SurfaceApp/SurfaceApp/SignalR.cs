@@ -12,7 +12,7 @@ using Owin;
 namespace SurfaceApp {
 	class SignalR {
 		private static SignalR singleton;
-		public Dictionary<byte, dynamic> phones = new Dictionary<byte, dynamic>();
+		public Dictionary<byte, string> Phones = new Dictionary<byte, string>();
 
 		private SignalR() { }
 
@@ -25,7 +25,21 @@ namespace SurfaceApp {
 		public void Start() {
 			string url = "http://localhost:9001";
 			WebApp.Start<Startup>(url);
+			PhoneHub.TagIdReceived += PhoneHubOnTagIdReceived;
 			Console.WriteLine("Server running on {0}", url);
+		}
+
+		private void PhoneHubOnTagIdReceived(byte tagValue, string connectionId) {
+			Console.WriteLine("Received identification message: " + tagValue);
+			Phones.Add(tagValue, connectionId);
+		}
+
+		public void RequestImageDownloadToPhone(byte phoneTag, string url, string filename) {
+			GlobalHost.ConnectionManager.GetHubContext<PhoneHub>().Clients.Client(Phones[phoneTag]).DownloadImageToPhone(url, filename);
+		}
+
+		public void RequestImageUploadToServer(byte phoneTag, string postUrl, string filename) {
+			GlobalHost.ConnectionManager.GetHubContext<PhoneHub>().Clients.Client(Phones[phoneTag]).UploadImageToServer(postUrl, filename);
 		}
 	}
 
@@ -37,9 +51,10 @@ namespace SurfaceApp {
 	}
 
 	public class PhoneHub : Hub {
+		public static event Action<byte, string> TagIdReceived;
+
 		public void SendTagId(byte tagValue) {
-			Console.WriteLine("Received identification message: " + tagValue);
-			SignalR.GetInstance().phones.Add(tagValue, Clients.Caller);
+			TagIdReceived(tagValue, Context.ConnectionId);
 		}
 	}
 }

@@ -48,7 +48,8 @@ public class MainActivity extends Activity {
 	
 	public void connectButtonClicked() {
 		EditText ipBox = (EditText) findViewById(R.id.editTextServerIp);
+		EditText tagBox = (EditText) findViewById(R.id.editTextTagId);
 		client = new NetworkClient(ipBox.getText().toString());
-		client.connectSignalR();
+		client.connectSignalR(Byte.parseByte(tagBox.getText().toString()));
 	}
 }
