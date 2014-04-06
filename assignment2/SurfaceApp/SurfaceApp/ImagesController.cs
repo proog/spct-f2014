@@ -2,6 +2,10 @@
 using System.Net.Http;
 using System.IO;
 using System.Configuration;
+using System.Drawing;
+using System.Net;
+using System.Threading.Tasks;
+using System;
 
 namespace SurfaceApp.Network
 {
@@ -31,9 +35,27 @@ namespace SurfaceApp.Network
             return resp;
         }
 
-        // POST api/values 
-        public void Post([FromBody]string value)
+        public HttpResponseMessage Post()
         {
+            if (!Request.Content.IsMimeMultipartContent())
+            {
+                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
+            }
+
+            var provider = new MultipartMemoryStreamProvider();
+
+            var task = Request.Content.ReadAsMultipartAsync(provider);
+            task.Wait();
+            foreach (var file in provider.Contents)
+            {
+                var fileName = file.Headers.ContentDisposition.FileName.Trim('\"');
+                Task<byte[]> readBuffer = file.ReadAsByteArrayAsync();
+                readBuffer.Wait();
+                byte[] buffer = readBuffer.Result;
+                ImageServer.GetInstance().SaveImage(Image.FromStream(new MemoryStream(buffer)));
+            }
+
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         // PUT api/values/5 

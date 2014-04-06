@@ -101,6 +101,7 @@
     <Compile Include="ImagesController.cs" />
     <Compile Include="ImageServer.cs" />
     <Compile Include="ImageServerConfig.cs" />
+    <Compile Include="ImageUploadTester.cs" />
     <Compile Include="SurfaceWindow1.xaml.cs">
       <DependentUpon>SurfaceWindow1.xaml</DependentUpon>
       <SubType>Code</SubType>

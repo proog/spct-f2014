@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -23,6 +25,8 @@ namespace SurfaceApp.Network
         private static readonly ImageServer singleton = new ImageServer();
         private bool started = false;
         private ReaderWriterLockSlim rwLock = new ReaderWriterLockSlim();
+
+
 
         static ImageServer()
         {
@@ -97,6 +101,14 @@ namespace SurfaceApp.Network
             }
         }
 
+        public void SaveImage(Image img)
+        {
+            var format = this.GetImageFormat(img);
+            // TODO create and store ImageInfo.
+            string fileName = String.Format("{0}{1}.{2}", ImageUploadPath, Guid.NewGuid(), format.ToString());
+            img.Save(fileName, img.RawFormat);
+        }
+
         /// <summary>
         /// Get the base address of the REST image server.
         /// </summary>
@@ -118,6 +130,23 @@ namespace SurfaceApp.Network
                 string appDir = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
                 return appDir + ConfigurationManager.AppSettings["img_upload_dir"];
             }
+        }
+
+        private ImageFormat GetImageFormat(Image img)
+        {
+            ImageFormat format = null;
+            ImageFormat inner = null;
+            // TODO support more image formats?
+            if (img.RawFormat.Equals(inner = ImageFormat.Png))
+                format = inner;
+            else if (img.RawFormat.Equals(inner = ImageFormat.Jpeg))
+                format = inner;
+            else if (img.RawFormat.Equals(inner = ImageFormat.Bmp))
+                format = inner;
+            else
+                // TODO better default?
+                format = ImageFormat.Wmf;
+            return format;
         }
 
         /// <summary>
