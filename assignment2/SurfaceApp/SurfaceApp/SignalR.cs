@@ -4,20 +4,28 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
+using Microsoft.AspNet.SignalR.Hubs;
 using Microsoft.Owin.Cors;
 using Microsoft.Owin.Hosting;
 using Owin;
 
 namespace SurfaceApp {
 	class SignalR {
-		private Dictionary<byte, dynamic> phones = new Dictionary<byte, dynamic>();
+		private static SignalR singleton;
+		public Dictionary<byte, dynamic> phones = new Dictionary<byte, dynamic>();
+
+		private SignalR() { }
+
+		public static SignalR GetInstance() {
+			if(singleton == null)
+				singleton = new SignalR();
+			return singleton;
+		}
 
 		public void Start() {
-			string url = "http://localhost:8080";
-			using (WebApp.Start(url)) {
-				Console.WriteLine("Server running on {0}", url);
-				//Console.ReadLine();
-			}
+			string url = "http://localhost:9001";
+			WebApp.Start<Startup>(url);
+			Console.WriteLine("Server running on {0}", url);
 		}
 	}
 
@@ -29,8 +37,9 @@ namespace SurfaceApp {
 	}
 
 	public class PhoneHub : Hub {
-		public void SendIdentification(byte tagValue) {
+		public void SendTagId(byte tagValue) {
 			Console.WriteLine("Received identification message: " + tagValue);
+			SignalR.GetInstance().phones.Add(tagValue, Clients.Caller);
 		}
 	}
 }
