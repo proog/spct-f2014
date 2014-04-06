@@ -9,9 +9,9 @@
             <s:TagVisualizer.Definitions>
                 <s:TagVisualizationDefinition Source="PhoneVisualization.xaml"
                                               PhysicalCenterOffsetFromTag="0,2"
-                                              LostTagTimeout="1000"
+                                              LostTagTimeout="10000"
                                               MaxCount="5"
-                                              TagRemovedBehavior="Fade">
+                                              TagRemovedBehavior="Disappear">
                     
                 </s:TagVisualizationDefinition>
             </s:TagVisualizer.Definitions>

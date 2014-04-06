@@ -110,8 +110,10 @@ namespace SurfaceApp
 
         private void TagVisualizer_VisualizationAdded(object sender, TagVisualizerEventArgs e)
         {
-            var vis = (TagVisualizer)sender;
-            
+            var visualizer = (TagVisualizer)sender;
+            var visualization = (PhoneVisualization) e.TagVisualization;
+            long tagVal = visualization.VisualizedTag.Value;
+            // TODO call some sort of onTagAdded(tagVal) event handler
         }
     }
 }
