@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -6,24 +6,60 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
     tools:context="dk.itu.spct.f2014.ma02.pmor.janv.imagebrowser.MainActivity" >
+    
+    <LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="horizontal"
+	    tools:context="dk.itu.spct.f2014.ma02.pmor.janv.imagebrowser.MainActivity" >
+	    
+        <EditText
+	        android:id="@+id/editTextServerIp"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:ems="9"
+	        android:inputType="textNoSuggestions"
+	        android:hint="Server IP" />
 
-    <Button
-        android:id="@+id/button1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/gridView1"
-        android:layout_alignParentTop="true"
-        android:onClick="reloadButtonClicked"
-        android:text="Reload images" />
+	    <Button
+	        android:id="@+id/connectButton"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:onClick="connectButtonClicked"
+	        android:text="Connect" />
+    
+    </LinearLayout>
+    
+    <LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="horizontal"
+	    tools:context="dk.itu.spct.f2014.ma02.pmor.janv.imagebrowser.MainActivity" >
+
+	    <Button
+	        android:id="@+id/button1"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:onClick="reloadButtonClicked"
+	        android:text="Reload images" />
+	
+	    <EditText
+	        android:id="@+id/editTextTagId"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:ems="10"
+	        android:hint="Tag id"
+	        android:inputType="number" />
+    
+    </LinearLayout>
     
     <GridView
         android:id="@+id/gridView1"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/button1"
         android:numColumns="3" >
     </GridView>
 
-</RelativeLayout>
+</LinearLayout>

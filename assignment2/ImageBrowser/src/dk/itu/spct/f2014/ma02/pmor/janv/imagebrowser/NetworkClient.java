@@ -14,50 +14,20 @@ import microsoft.aspnet.signalr.client.hubs.HubConnection;
 import microsoft.aspnet.signalr.client.hubs.HubProxy;
 
 public class NetworkClient {
-	public String host;
+	public String serverIp;
+	private int restPort = 9000;
+	private int signalrPort = 9001;
 	
-	public NetworkClient(String host) {
-		this.host = host;
-		
+	public NetworkClient(String ip) {
+		this.serverIp = ip;
+	}
+	
+	public void connectSignalR() {
 		Platform.loadPlatformComponent(new AndroidPlatformComponent());
-		HubConnection con = new HubConnection(host);
+		HubConnection con = new HubConnection("http://" + serverIp + ":" + signalrPort + "/signalr");
 		HubProxy hub = con.createHubProxy("PhoneHub");
 		hub.invoke("SendIdentification", new Byte((byte)5));
 		
-		hub.subscribe(this);
-	}
-	
-	public void SendIdentification(final byte tagValue) {
-		
-	}
-	
-	/**
-	 * Called by the SignalR server when this phone should download an image.
-	 * @param url The URL of the image to download from the web server.
-	 * @param f The file in which the data will be downloaded
-	 * @throws IOException If the connection could not be established.
-	 */
-	public void downloadImage(URL url, File f) throws IOException {
-		InputStream input = url.openStream();
-		FileOutputStream output = new FileOutputStream(f);
-		
-		int n = 0;
-		byte[] buffer = new byte[4096];
-		while((n = input.read(buffer)) != -1) {
-			output.write(buffer, 0, n);
-		}
-		
-		output.flush();
-		output.close();
-		input.close();
-	}
-	
-	/**
-	 * Upload a file to the web server.
-	 * @param f The file to upload
-	 */
-	public void UploadImage(File f) {
-		UploadImageTask uit = new UploadImageTask(host);
-		uit.execute(f);
+		hub.subscribe(new PhoneHubSubscriptionHandler());
 	}
 }

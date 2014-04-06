@@ -1,40 +1,27 @@
 package dk.itu.spct.f2014.ma02.pmor.janv.imagebrowser;
 
 import java.io.File;
-import java.io.FileFilter;
-import java.io.FilenameFilter;
 
 import android.app.Activity;
-import android.app.ActionBar;
-import android.app.Fragment;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.GridView;
-import android.widget.ImageView;
-import android.os.Build;
-import android.provider.MediaStore.Files;
 
 public class MainActivity extends Activity {
 	private ImageAdapter imageAdapter;
+	private NetworkClient client;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
-		if (savedInstanceState == null) {
-			
-		}
 		
 		reloadImages();
-		
-		NetworkClient client = new NetworkClient("http://10.25.230.167:8080");
 	}
 	
 	private void reloadImages() {
@@ -59,5 +46,11 @@ public class MainActivity extends Activity {
 	
 	public void reloadButtonClicked(View view) {
 		reloadImages();
+	}
+	
+	public void connectButtonClicked() {
+		EditText ipBox = (EditText) findViewById(R.id.editTextServerIp);
+		client = new NetworkClient(ipBox.getText().toString());
+		client.connectSignalR();
 	}
 }
