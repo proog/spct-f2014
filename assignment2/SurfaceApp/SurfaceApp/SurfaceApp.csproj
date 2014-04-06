@@ -105,6 +105,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="PhoneVisualization.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="SurfaceWindow1.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -118,6 +122,9 @@
     <Compile Include="ImageServer.cs" />
     <Compile Include="ImageServerConfig.cs" />
     <Compile Include="ImageUploadTester.cs" />
+    <Compile Include="PhoneVisualization.xaml.cs">
+      <DependentUpon>PhoneVisualization.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SignalR.cs" />
     <Compile Include="SurfaceWindow1.xaml.cs">
       <DependentUpon>SurfaceWindow1.xaml</DependentUpon>

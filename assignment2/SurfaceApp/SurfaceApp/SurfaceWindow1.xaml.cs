@@ -107,5 +107,11 @@ namespace SurfaceApp
         {
             //TODO: disable audio, animations here
         }
+
+        private void TagVisualizer_VisualizationAdded(object sender, TagVisualizerEventArgs e)
+        {
+            var vis = (TagVisualizer)sender;
+            
+        }
     }
 }

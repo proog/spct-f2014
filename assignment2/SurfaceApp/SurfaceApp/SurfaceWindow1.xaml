@@ -4,7 +4,18 @@
     xmlns:s="http://schemas.microsoft.com/surface/2008"
     Title="SurfaceApp"
     >
-  <Grid>
+    <Grid>
+        <s:TagVisualizer HorizontalAlignment="Left" VerticalAlignment="Top" Height="505" Width="750" VisualizationAdded="TagVisualizer_VisualizationAdded">
+            <s:TagVisualizer.Definitions>
+                <s:TagVisualizationDefinition Source="PhoneVisualization.xaml"
+                                              PhysicalCenterOffsetFromTag="0,2"
+                                              LostTagTimeout="1000"
+                                              MaxCount="5"
+                                              TagRemovedBehavior="Fade">
+                    
+                </s:TagVisualizationDefinition>
+            </s:TagVisualizer.Definitions>
+        </s:TagVisualizer>
 
-  </Grid>
+    </Grid>
 </s:SurfaceWindow>
