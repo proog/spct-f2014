@@ -117,6 +117,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="IImageObserver.cs" />
     <Compile Include="ImageInfo.cs" />
     <Compile Include="ImagesController.cs" />
     <Compile Include="ImageServer.cs" />

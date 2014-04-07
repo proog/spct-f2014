@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -16,31 +15,48 @@ using Microsoft.Surface.Presentation;
 using Microsoft.Surface.Presentation.Controls;
 using Microsoft.Surface.Presentation.Input;
 using SurfaceApp.Network;
+using System.Collections.ObjectModel;
+using System.Drawing;
 
 namespace SurfaceApp
 {
     /// <summary>
     /// Interaction logic for SurfaceWindow1.xaml
     /// </summary>
-    public partial class SurfaceWindow1 : SurfaceWindow
+    public partial class SurfaceWindow1 : SurfaceWindow, IImageObserver
     {
+
+        public ObservableCollection<Image> ImagesInScatterView
+        {
+            get;
+            private set;
+        }
+
         /// <summary>
         /// Default constructor.
         /// </summary>
         public SurfaceWindow1()
         {
             InitializeComponent();
+            ImagesInScatterView = new ObservableCollection<Image>();
 
             // Add handlers for window availability events
             AddWindowAvailabilityHandlers();
             // Start the REST web service.
             ImageServer.GetInstance().Start();
+            // Register self as observant
+            ImageServer.GetInstance().AddObserver(this);
             //System.Threading.Thread.Sleep(2500);
             var tester = new ImageUploadTester();
             tester.StartUpload();
 			// Start the SignalR hub
 			SignalR.GetInstance().Start();
 		}
+
+        public void ImageAdded(Image newImage)
+        {
+            ImagesInScatterView.Add(newImage);
+        }
 
         /// <summary>
         /// Occurs when the window is about to close. 

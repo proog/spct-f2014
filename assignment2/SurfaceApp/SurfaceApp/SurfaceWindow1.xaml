@@ -12,9 +12,16 @@
                                               LostTagTimeout="10000"
                                               MaxCount="5"
                                               TagRemovedBehavior="Disappear">
-                    
+
                 </s:TagVisualizationDefinition>
             </s:TagVisualizer.Definitions>
+            <s:ScatterView Name="scatterView" HorizontalAlignment="Left" VerticalAlignment="Top" Height="505" Width="750" ItemsSource="{Binding ImagesInScatterView}">
+                <s:ScatterView.ItemTemplate>
+                    <DataTemplate>
+                        <Image Source="{Binding ImgesInScatterView}" />
+                    </DataTemplate>
+                </s:ScatterView.ItemTemplate>
+            </s:ScatterView>
         </s:TagVisualizer>
 
     </Grid>
