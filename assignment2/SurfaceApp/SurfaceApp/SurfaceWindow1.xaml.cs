@@ -47,8 +47,8 @@ namespace SurfaceApp
             // Register self as observant
             ImageServer.GetInstance().AddObserver(this);
             //System.Threading.Thread.Sleep(2500);
-            var tester = new ImageUploadTester();
-            tester.StartUpload();
+            //var tester = new ImageUploadTester();
+            //tester.StartUpload();
 			// Start the SignalR hub
 			SignalR.GetInstance().Start();
 		}
@@ -68,6 +68,8 @@ namespace SurfaceApp
 
             // Remove handlers for window availability events
             RemoveWindowAvailabilityHandlers();
+
+			SignalR.GetInstance().Stop();
         }
 
         /// <summary>

@@ -111,7 +111,15 @@ namespace SurfaceApp.Network
             var path = this.InitDeviceUploadDir(deviceId);
             // TODO create and store ImageInfo.
             string fileName = String.Format("{0}{1}", path, imgFileName);
-            img.Save(fileName, img.RawFormat);
+			
+			// create unique filename if necessary, but disabled for now
+			/*if(File.Exists(fileName)) {
+				string[] split = fileName.Split('.');
+				string ext = split[split.Length - 1];
+				fileName = split[0] + "_" + DateTime.Now.Ticks + "." + ext;
+			}*/
+
+	        img.Save(fileName, img.RawFormat);
             foreach (var obs in observers)
             {
                 obs.ImageAdded(img);
@@ -190,5 +198,17 @@ namespace SurfaceApp.Network
                 Directory.CreateDirectory(ImageUploadPath);
             }
         }
+
+		/// <summary>
+		/// Removes a directory and its contents for a given device. This is called when the device sends a disconnect signal to the SignalR server.
+		/// </summary>
+		/// <param name="deviceId">The device id.</param>
+		public void RemoveDeviceUploadDir(int deviceId) {
+			rwLock.EnterWriteLock();
+			string path = ImageUploadPath + deviceId + "\\";
+			if(Directory.Exists(path))
+				Directory.Delete(path, true);
+			rwLock.ExitWriteLock();
+		}
     }
 }

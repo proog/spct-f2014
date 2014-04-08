@@ -8,6 +8,7 @@ using Microsoft.AspNet.SignalR.Hubs;
 using Microsoft.Owin.Cors;
 using Microsoft.Owin.Hosting;
 using Owin;
+using SurfaceApp.Network;
 
 namespace SurfaceApp {
 	class SignalR {
@@ -23,15 +24,28 @@ namespace SurfaceApp {
 		}
 
 		public void Start() {
-			string url = "http://localhost:9001";
+			string url = "http://*:9001";
 			WebApp.Start<Startup>(url);
 			PhoneHub.TagIdReceived += PhoneHubOnTagIdReceived;
+			PhoneHub.DisconnectSignalReceived += PhoneHubOnDisconnectSignalReceived;
 			Console.WriteLine("Server running on {0}", url);
+		}
+
+		public void Stop() {
+			
 		}
 
 		private void PhoneHubOnTagIdReceived(byte tagValue, string connectionId) {
 			Console.WriteLine("Received identification message: " + tagValue);
-			Phones.Add(tagValue, connectionId);
+			Phones[tagValue] = connectionId;
+			RequestAllImagesUploadToServer(tagValue, "/images/" + tagValue);
+			//RequestImageDownloadToPhone(tagValue, "/images/20/app_chart.png", "app_chart.png");
+		}
+
+		private void PhoneHubOnDisconnectSignalReceived(byte tagValue) {
+			Console.WriteLine("Received disconnect signal from " + tagValue);
+			Phones.Remove(tagValue);
+			ImageServer.GetInstance().RemoveDeviceUploadDir(tagValue);
 		}
 
 		public void RequestImageDownloadToPhone(byte phoneTag, string url, string filename) {
@@ -40,6 +54,10 @@ namespace SurfaceApp {
 
 		public void RequestImageUploadToServer(byte phoneTag, string postUrl, string filename) {
 			GlobalHost.ConnectionManager.GetHubContext<PhoneHub>().Clients.Client(Phones[phoneTag]).UploadImageToServer(postUrl, filename);
+		}
+
+		public void RequestAllImagesUploadToServer(byte phoneTag, string postUrl) {
+			GlobalHost.ConnectionManager.GetHubContext<PhoneHub>().Clients.Client(Phones[phoneTag]).UploadAllImagesToServer(postUrl);
 		}
 	}
 
@@ -52,9 +70,16 @@ namespace SurfaceApp {
 
 	public class PhoneHub : Hub {
 		public static event Action<byte, string> TagIdReceived;
+		public static event Action<byte> DisconnectSignalReceived;
 
 		public void SendTagId(byte tagValue) {
-			TagIdReceived(tagValue, Context.ConnectionId);
+			if(TagIdReceived != null)
+				TagIdReceived(tagValue, Context.ConnectionId);
+		}
+
+		public void SendDisconnectSignal(byte tagValue) {
+			if(DisconnectSignalReceived != null)
+				DisconnectSignalReceived(tagValue);
 		}
 	}
 }

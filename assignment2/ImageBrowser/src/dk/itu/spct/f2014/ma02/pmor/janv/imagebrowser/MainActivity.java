@@ -7,6 +7,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 
@@ -20,6 +22,14 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		
 		reloadImages();
+	}
+	
+	@Override
+	protected void onDestroy() {
+		if(client != null)
+			client.disconnectSignalR();
+		
+		super.onDestroy();
 	}
 	
 	private void reloadImages() {
@@ -46,10 +56,32 @@ public class MainActivity extends Activity {
 		reloadImages();
 	}
 	
-	public void connectButtonClicked() {
+	public void connectButtonClicked(final View view) {
 		EditText ipBox = (EditText) findViewById(R.id.editTextServerIp);
 		EditText tagBox = (EditText) findViewById(R.id.editTextTagId);
-		client = new NetworkClient(ipBox.getText().toString());
-		client.connectSignalR(Byte.parseByte(tagBox.getText().toString()));
+		client = new NetworkClient(ipBox.getText().toString(), Byte.parseByte(tagBox.getText().toString()));
+		client.connectSignalR();
+		
+		Button connectButton = (Button) view;
+		connectButton.setText("Disconnect");
+		connectButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				disconnectButtonClicked(view);
+			}
+		});
+	}
+	
+	public void disconnectButtonClicked(final View view) {
+		client.disconnectSignalR();
+		
+		Button b = (Button) view;
+		b.setText("Connect");
+		b.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				connectButtonClicked(view);
+			}
+		});
 	}
 }

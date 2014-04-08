@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 public class RestHandler {
+	public static int restPort = 9000;
 	
 	/**
 	 * Called by the SignalR server when this phone should download an image.
