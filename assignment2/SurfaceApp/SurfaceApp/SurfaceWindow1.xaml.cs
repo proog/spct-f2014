@@ -1,7 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using Microsoft.Surface;
+using Microsoft.Surface.Presentation;
 using Microsoft.Surface.Presentation.Controls;
 using SurfaceApp.Network;
 
@@ -111,8 +116,35 @@ namespace SurfaceApp
             var visualizer = (TagVisualizer) sender;
             var visualization = (PhoneVisualization) e.TagVisualization;
             long tagVal = visualization.VisualizedTag.Value;
-            
-            // TODO call some sort of onTagAdded(tagVal) event handler
+	        visualization.DeviceId = (byte) tagVal;
+
+	        // TODO maybe request the phone to upload all images here?
+
+
+
+	        // TODO call some sort of onTagAdded(tagVal) event handler
         }
+
+		private void StackPanel_PreviewTouchDown_1(object sender, TouchEventArgs e) {
+			var draggedItem = e.OriginalSource as System.Windows.Controls.Image;
+
+			Console.WriteLine(e.OriginalSource);
+
+			if(draggedItem == null)
+				return;
+
+			var cursor = new ContentControl()
+				             {
+					             Content = draggedItem.DataContext
+				             };
+			var devices = new List<InputDevice> {e.TouchDevice};
+			var dragSource = draggedItem;
+
+			var imageInfo = new ImageInfo(28, "dummy\\images\\28\\hille.jpg");
+
+			SurfaceDragDrop.BeginDragDrop(dragSource, draggedItem, cursor, imageInfo, devices, DragDropEffects.Link);
+
+			e.Handled = true;
+		}
     }
 }

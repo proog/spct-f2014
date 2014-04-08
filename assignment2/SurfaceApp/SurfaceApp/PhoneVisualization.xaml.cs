@@ -1,4 +1,6 @@
-﻿using Microsoft.Surface.Presentation.Controls;
+﻿using System.Windows.Controls.Primitives;
+using Microsoft.Surface.Presentation;
+using Microsoft.Surface.Presentation.Controls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,11 +21,27 @@ namespace SurfaceApp
     /// <summary>
     /// Interaction logic for PhoneVisualization.xaml
     /// </summary>
-    public partial class PhoneVisualization : TagVisualization
-    {
-        public PhoneVisualization()
-        {
-            InitializeComponent();
+    public partial class PhoneVisualization : TagVisualization {
+		public bool Pinned { get; private set; }
+		public byte DeviceId { get; set; }
+
+        public PhoneVisualization() {
+	        InitializeComponent();
         }
+
+		private void PinButtonClick(object sender, RoutedEventArgs e) {
+			var tb = sender as ToggleButton;
+
+			Pinned = tb.IsChecked.HasValue && tb.IsChecked.Value;
+		}
+
+		private void Rectangle_Drop_1(object sender, SurfaceDragDropEventArgs e) {
+			Console.WriteLine(e.Cursor.Data as string);
+
+			var imageInfo = e.Cursor.Data as ImageInfo;
+			var split = imageInfo.FilePath.Split(new[] { "\\images\\" + imageInfo.OriginId + "\\" }, StringSplitOptions.RemoveEmptyEntries);
+			var url = "/images/" + imageInfo.OriginId + "/" + split[split.Length - 1];
+			SignalR.GetInstance().RequestImageDownloadToPhone(DeviceId, url, split[split.Length - 1]);
+		}
     }
 }

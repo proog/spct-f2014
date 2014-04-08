@@ -6,23 +6,22 @@
     Title="SurfaceApp"
     >
     <Grid>
-        <s:TagVisualizer HorizontalAlignment="Left" VerticalAlignment="Top" Height="505" Width="750" VisualizationAdded="TagVisualizer_VisualizationAdded">
+        <s:TagVisualizer HorizontalAlignment="Left" VerticalAlignment="Top" VisualizationAdded="TagVisualizer_VisualizationAdded">
             <s:TagVisualizer.Definitions>
                 <s:TagVisualizationDefinition Source="PhoneVisualization.xaml"
                                               PhysicalCenterOffsetFromTag="0,2"
                                               LostTagTimeout="10000"
                                               MaxCount="5"
                                               TagRemovedBehavior="Disappear">
-
                 </s:TagVisualizationDefinition>
             </s:TagVisualizer.Definitions>
-            <s:ScatterView Name="ScatterView" HorizontalAlignment="Left" VerticalAlignment="Top" Height="505" Width="750">
+            <s:ScatterView Name="ScatterView" HorizontalAlignment="Left" VerticalAlignment="Top">
                <s:ScatterView.DataContext>
                     <local:ScatterViewViewModel />
                 </s:ScatterView.DataContext>
                 <s:ScatterView.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel>
+                        <StackPanel PreviewTouchDown="StackPanel_PreviewTouchDown_1">
                             <Label Content="{Binding OriginId}"/>
                             <Image Source="{Binding FilePath}"/>
                         </StackPanel>

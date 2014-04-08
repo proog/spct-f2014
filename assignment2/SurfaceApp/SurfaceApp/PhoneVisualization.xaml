@@ -1,8 +1,12 @@
 ﻿<s:TagVisualization x:Class="SurfaceApp.PhoneVisualization"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:s="http://schemas.microsoft.com/surface/2008">
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:s="http://schemas.microsoft.com/surface/2008"
+            Visibility="Visible">
     <Grid>
-        <Label>Placeholder for phone image</Label>
+        <StackPanel>
+            <ToggleButton Content="Pin" Checked="PinButtonClick"/>
+            <Rectangle Width="200" Height="100" Fill="Pink" AllowDrop="True" s:SurfaceDragDrop.Drop="Rectangle_Drop_1"/>
+        </StackPanel>
     </Grid>
 </s:TagVisualization>
