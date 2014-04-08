@@ -69,8 +69,7 @@ namespace SurfaceApp
             var stb = sender as SurfaceToggleButton;
             if (stb.IsChecked.HasValue && !stb.IsChecked.Value)
             {
-                this.TagRemovedBehavior = TagRemovedBehavior.Fade;
-                this._btnPin.Content = GetBtnPinToolTip();
+                this.Visualizer.RemoveVisualization(this);
             }
         }
     }
