@@ -22,7 +22,10 @@
                 </s:ScatterView.DataContext>
                 <s:ScatterView.ItemTemplate>
                     <DataTemplate>
-                        <Image Source="{Binding}"/>
+                        <StackPanel>
+                            <Label Content="{Binding OriginId}"/>
+                            <Image Source="{Binding FilePath}"/>
+                        </StackPanel>
                     </DataTemplate>
                 </s:ScatterView.ItemTemplate>
             </s:ScatterView>

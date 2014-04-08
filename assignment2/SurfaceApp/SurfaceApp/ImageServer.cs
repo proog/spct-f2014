@@ -1,4 +1,5 @@
-﻿using Microsoft.Owin.Hosting;
+﻿using System.Runtime.InteropServices;
+using Microsoft.Owin.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -24,6 +25,8 @@ namespace SurfaceApp.Network
         private static readonly ImageServer singleton = new ImageServer();
         private bool started = false;
         private ReaderWriterLockSlim rwLock = new ReaderWriterLockSlim();
+
+	    public event Action<byte, string> ImageAdded;
 
         static ImageServer()
         {
@@ -104,7 +107,15 @@ namespace SurfaceApp.Network
             var path = this.InitDeviceUploadDir(deviceId);
             // TODO create and store ImageInfo.
             string fileName = String.Format("{0}{1}", path, imgFileName);
-            img.Save(fileName, img.RawFormat);
+			try {
+				img.Save(fileName, img.RawFormat);
+			}
+			catch(ExternalException exe) {
+				
+			}
+
+	        if(ImageAdded != null)
+				ImageAdded((byte) deviceId, fileName);
         }
 
         /// <summary>

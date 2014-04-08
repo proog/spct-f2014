@@ -11,23 +11,33 @@ namespace SurfaceApp
     /// </summary>
     public class ImageInfo
     {
+	    protected bool Equals(ImageInfo other) {
+		    return OriginId == other.OriginId && string.Equals(FilePath, other.FilePath);
+	    }
 
-        /// <summary>
-        /// Get or set the server side ID of this image.
-        /// </summary>
-        public long Id { get; set; }
+	    public override int GetHashCode() {
+		    unchecked {
+			    return (OriginId.GetHashCode()*397) ^ (FilePath != null ? FilePath.GetHashCode() : 0);
+		    }
+	    }
+
+	    public ImageInfo(byte originId, string filePath) {
+			FilePath = filePath;
+			OriginId = originId;
+		}
 
         /// <summary>
         /// Get or set the ID of the device that provided this image.
         /// </summary>
-        public String originId { get; set; }
+        public byte OriginId { get; private set; }
 
-        public string FileName {
-            get
-            {
-                // TODO extension needed?
-                return this.Id.ToString() + ".image";
-            }
-        }
+		public string FilePath { get; private set; }
+
+		public override bool Equals(object obj) {
+			if (ReferenceEquals(null, obj)) return false;
+			if (ReferenceEquals(this, obj)) return true;
+			if (obj.GetType() != this.GetType()) return false;
+			return Equals((ImageInfo) obj);
+		}
     }
 }
