@@ -10,35 +10,32 @@ namespace SurfaceApp
     /// <summary>
     ///     Interaction logic for SurfaceWindow1.xaml
     /// </summary>
-    public partial class SurfaceWindow1 : SurfaceWindow, IImageObserver
+    public partial class SurfaceWindow1 : SurfaceWindow
     {
+        private readonly ScatterViewViewModel vm = new ScatterViewViewModel();
+
         /// <summary>
         ///     Default constructor.
         /// </summary>
         public SurfaceWindow1()
         {
             InitializeComponent();
-            ImagesInScatterView = new ObservableCollection<Image>();
 
             // Add handlers for window availability events
             AddWindowAvailabilityHandlers();
             // Start the REST web service.
             ImageServer.GetInstance().Start();
-            // Register self as observant
-            ImageServer.GetInstance().AddObserver(this);
             //System.Threading.Thread.Sleep(2500);
             //var tester = new ImageUploadTester();
             //tester.StartUpload();
-			// Start the SignalR hub
-			SignalR.GetInstance().Start();
-		}
+            // Start the SignalR hub
+            SignalR.GetInstance().Start();
+        }
 
-        public ObservableCollection<Image> ImagesInScatterView { get; private set; }
-
-
-        public void ImageAdded(Image newImage)
+        protected override void OnInitialized(EventArgs e)
         {
-            ImagesInScatterView.Add(newImage);
+            base.OnInitialized(e);
+            ScatterView.ItemsSource = vm.Images;
         }
 
         /// <summary>
@@ -114,6 +111,7 @@ namespace SurfaceApp
             var visualizer = (TagVisualizer) sender;
             var visualization = (PhoneVisualization) e.TagVisualization;
             long tagVal = visualization.VisualizedTag.Value;
+            
             // TODO call some sort of onTagAdded(tagVal) event handler
         }
     }

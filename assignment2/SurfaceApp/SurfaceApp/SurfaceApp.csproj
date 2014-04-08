@@ -126,6 +126,7 @@
     <Compile Include="PhoneVisualization.xaml.cs">
       <DependentUpon>PhoneVisualization.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ScatterViewViewModel.cs" />
     <Compile Include="SignalR.cs" />
     <Compile Include="SurfaceWindow1.xaml.cs">
       <DependentUpon>SurfaceWindow1.xaml</DependentUpon>
@@ -150,7 +151,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="app.config" />
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

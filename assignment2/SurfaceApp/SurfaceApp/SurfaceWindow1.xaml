@@ -2,6 +2,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:s="http://schemas.microsoft.com/surface/2008"
+    xmlns:local="clr-namespace:SurfaceApp"
     Title="SurfaceApp"
     >
     <Grid>
@@ -15,10 +16,13 @@
 
                 </s:TagVisualizationDefinition>
             </s:TagVisualizer.Definitions>
-            <s:ScatterView Name="scatterView" HorizontalAlignment="Left" VerticalAlignment="Top" Height="505" Width="750" ItemsSource="{Binding ImagesInScatterView}">
+            <s:ScatterView Name="ScatterView" HorizontalAlignment="Left" VerticalAlignment="Top" Height="505" Width="750">
+               <s:ScatterView.DataContext>
+                    <local:ScatterViewViewModel />
+                </s:ScatterView.DataContext>
                 <s:ScatterView.ItemTemplate>
                     <DataTemplate>
-                        <Image Source="{Binding ImgesInScatterView}" />
+                        <Image Source="{Binding}"/>
                     </DataTemplate>
                 </s:ScatterView.ItemTemplate>
             </s:ScatterView>

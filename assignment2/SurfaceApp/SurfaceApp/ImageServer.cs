@@ -25,8 +25,6 @@ namespace SurfaceApp.Network
         private bool started = false;
         private ReaderWriterLockSlim rwLock = new ReaderWriterLockSlim();
 
-        private List<IImageObserver> observers = new List<IImageObserver>();
-
         static ImageServer()
         {
             InitUploadDir();
@@ -74,11 +72,6 @@ namespace SurfaceApp.Network
             //}
         }
 
-        public void AddObserver(IImageObserver observer)
-        {
-            this.observers.Add(observer);
-        }
-
         /// <summary>
         /// Starts the image server.
         /// </summary>
@@ -111,19 +104,7 @@ namespace SurfaceApp.Network
             var path = this.InitDeviceUploadDir(deviceId);
             // TODO create and store ImageInfo.
             string fileName = String.Format("{0}{1}", path, imgFileName);
-			
-			// create unique filename if necessary, but disabled for now
-			/*if(File.Exists(fileName)) {
-				string[] split = fileName.Split('.');
-				string ext = split[split.Length - 1];
-				fileName = split[0] + "_" + DateTime.Now.Ticks + "." + ext;
-			}*/
-
-	        img.Save(fileName, img.RawFormat);
-            foreach (var obs in observers)
-            {
-                obs.ImageAdded(img);
-            }
+            img.Save(fileName, img.RawFormat);
         }
 
         /// <summary>
