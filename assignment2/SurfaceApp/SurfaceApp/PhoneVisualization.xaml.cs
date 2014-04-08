@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Microsoft.Surface.Presentation.Controls.Primitives;
 
 namespace SurfaceApp
 {
@@ -24,6 +25,14 @@ namespace SurfaceApp
     public partial class PhoneVisualization : TagVisualization {
 		public bool Pinned { get; private set; }
 		public byte DeviceId { get; set; }
+
+        public string GetBtnPinToolTip()
+        {
+            if (_btnPin.IsChecked.HasValue && _btnPin.IsChecked.Value)
+                return "Unpin phone";
+            else
+                return "Pin phone";
+        }
 
         public PhoneVisualization() {
 	        InitializeComponent();
@@ -43,5 +52,26 @@ namespace SurfaceApp
 			var url = "/images/" + imageInfo.OriginId + "/" + split[split.Length - 1];
 			SignalR.GetInstance().RequestImageDownloadToPhone(DeviceId, url, split[split.Length - 1]);
 		}
+
+        private void BtnPin_Checked(object sender, RoutedEventArgs e)
+        {
+            var stb = sender as SurfaceToggleButton;
+            if (stb.IsChecked.HasValue && stb.IsChecked.Value)
+            {
+                this.TagRemovedBehavior = TagRemovedBehavior.Persist;
+                this._btnPin.Content = GetBtnPinToolTip();
+            }
+                
+        }
+
+        private void BtnPin_Unchecked(object sender, RoutedEventArgs e)
+        {
+            var stb = sender as SurfaceToggleButton;
+            if (stb.IsChecked.HasValue && !stb.IsChecked.Value)
+            {
+                this.TagRemovedBehavior = TagRemovedBehavior.Fade;
+                this._btnPin.Content = GetBtnPinToolTip();
+            }
+        }
     }
 }

@@ -10,9 +10,7 @@
             <s:TagVisualizer.Definitions>
                 <s:TagVisualizationDefinition Source="PhoneVisualization.xaml"
                                               PhysicalCenterOffsetFromTag="0,2"
-                                              LostTagTimeout="10000"
-                                              MaxCount="5"
-                                              TagRemovedBehavior="Disappear">
+                                              MaxCount="5">
                 </s:TagVisualizationDefinition>
             </s:TagVisualizer.Definitions>
             <s:ScatterView Name="ScatterView" HorizontalAlignment="Left" VerticalAlignment="Top">

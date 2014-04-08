@@ -2,10 +2,12 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
             xmlns:s="http://schemas.microsoft.com/surface/2008"
-            Visibility="Visible">
+            Visibility="Visible"
+            TagRemovedBehavior="Fade"
+            LostTagTimeout="3000">
     <Grid>
         <StackPanel>
-            <ToggleButton Content="Pin" Checked="PinButtonClick"/>
+            <s:SurfaceToggleButton Name="_btnPin" Content="Pin phone" Checked="BtnPin_Checked" Unchecked="BtnPin_Unchecked" />
             <Rectangle Width="200" Height="100" Fill="Pink" AllowDrop="True" s:SurfaceDragDrop.Drop="Rectangle_Drop_1"/>
         </StackPanel>
     </Grid>
