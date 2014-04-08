@@ -15,6 +15,8 @@ namespace SurfaceApp {
 		private static SignalR singleton;
 		public Dictionary<byte, string> Phones = new Dictionary<byte, string>();
 
+		public event Action<byte> DeviceDisconnected;
+
 		private SignalR() { }
 
 		public static SignalR GetInstance() {
@@ -45,7 +47,10 @@ namespace SurfaceApp {
 		private void PhoneHubOnDisconnectSignalReceived(byte tagValue) {
 			Console.WriteLine("Received disconnect signal from " + tagValue);
 			Phones.Remove(tagValue);
-			ImageServer.GetInstance().RemoveDeviceUploadDir(tagValue);
+			//ImageServer.GetInstance().RemoveDeviceUploadDir(tagValue);
+
+			if(DeviceDisconnected != null)
+				DeviceDisconnected(tagValue);
 		}
 
 		public void RequestImageDownloadToPhone(byte phoneTag, string url, string filename) {
