@@ -6,9 +6,17 @@
             TagRemovedBehavior="Fade"
             LostTagTimeout="3000">
     <Grid>
-        <StackPanel>
-            <s:SurfaceToggleButton Name="_btnPin" Content="Pin phone" Checked="BtnPin_Checked" Unchecked="BtnPin_Unchecked" />
-            <Rectangle Width="200" Height="100" Fill="Pink" AllowDrop="True" s:SurfaceDragDrop.Drop="Rectangle_Drop_1"/>
-        </StackPanel>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <s:SurfaceToggleButton Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Name="_btnPin" Content="Pin phone" Checked="BtnPin_Checked" Unchecked="BtnPin_Unchecked" />
+        <Rectangle Grid.Row="0" Grid.Column="0" Fill="Pink" AllowDrop="True" s:SurfaceDragDrop.Drop="Rectangle_Drop_1"/>
+        <TextBlock>Drag images here.</TextBlock>
+        <Image Grid.Row="0" Grid.Column="1" Source="pack://application:,,,/Resources/nexus4.png"/>
     </Grid>
 </s:TagVisualization>
