@@ -28,7 +28,7 @@ namespace SurfaceApp
 
         public string GetBtnPinToolTip()
         {
-            if (_btnPin.IsChecked.HasValue && _btnPin.IsChecked.Value)
+            if (BtnPin.IsChecked.HasValue && BtnPin.IsChecked.Value)
                 return "Unpin phone";
             else
                 return "Pin phone";
@@ -44,7 +44,7 @@ namespace SurfaceApp
 			Pinned = tb.IsChecked.HasValue && tb.IsChecked.Value;
 		}
 
-		private void Rectangle_Drop_1(object sender, SurfaceDragDropEventArgs e) {
+		private void PhoneImageDropHandler(object sender, SurfaceDragDropEventArgs e) {
 			Console.WriteLine(e.Cursor.Data as string);
 
 			var imageInfo = e.Cursor.Data as ImageInfo;
@@ -59,7 +59,7 @@ namespace SurfaceApp
             if (stb.IsChecked.HasValue && stb.IsChecked.Value)
             {
                 this.TagRemovedBehavior = TagRemovedBehavior.Persist;
-                this._btnPin.Content = GetBtnPinToolTip();
+                this.BtnPin.Content = GetBtnPinToolTip();
             }
                 
         }
