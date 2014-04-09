@@ -74,6 +74,7 @@ public class MainActivity extends Activity implements ITaskCallback<Boolean>, IR
 	
 	private void displayImage(File f) {
 		imageAdapter.imageList.add(Uri.fromFile(f));
+		imageAdapter.notifyDataSetChanged();
 	}
 	
 	public void reloadButtonClicked(View view) {
