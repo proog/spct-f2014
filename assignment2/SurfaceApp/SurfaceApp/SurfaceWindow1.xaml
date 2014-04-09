@@ -19,10 +19,10 @@
                 </s:ScatterView.DataContext>
                 <s:ScatterView.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel PreviewTouchDown="StackPanel_PreviewTouchDown_1">
-                            <Label Content="{Binding OriginId}"/>
+                        <DockPanel PreviewTouchDown="StackPanel_PreviewTouchDown_1" >
+                            <Label Content="{Binding OriginId}" />
                             <Image Source="{Binding Image}" />
-                        </StackPanel>
+                        </DockPanel>
                     </DataTemplate>
                 </s:ScatterView.ItemTemplate>
             </s:ScatterView>

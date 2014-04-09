@@ -32,10 +32,6 @@ namespace SurfaceApp
 		    disp.Invoke(() => LoadImage(filePath));
 	    }
 
-		public void DisposeImage() {
-			
-		}
-
 		private void LoadImage(string filePath) {
 			var u = new Uri(filePath);
 			Image = new BitmapImage();
