@@ -21,7 +21,7 @@ public class PhoneHubSubscriptionHandler implements SubscriptionHandler {
 		File downloadFile = new File(imgFolder + "/" + filename);
 		
 		try {
-			RestHandler.downloadImage(new URL("http://" + NetworkClient.serverIp + ":" + RestHandler.restPort + url), downloadFile);
+			RestHandler.getInstance().downloadImage(new URL("http://" + NetworkClient.serverIp + ":" + RestHandler.restPort + url), downloadFile);
 		} catch (MalformedURLException e) {
 			Log.e("", "DownloadImageToPhone: " + e.getLocalizedMessage());
 		} catch (IOException e) {

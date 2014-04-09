@@ -13,7 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 
-public class MainActivity extends Activity implements ITaskCallback<Boolean> {
+public class MainActivity extends Activity implements ITaskCallback<Boolean>, IRestHandlerObserver {
 	private ImageAdapter imageAdapter;
 	private NetworkClient client;
 	
@@ -31,6 +31,29 @@ public class MainActivity extends Activity implements ITaskCallback<Boolean> {
 			client.disconnectSignalR();
 		
 		super.onDestroy();
+	}
+	
+	@Override
+	protected void onStart() {
+		super.onStart();
+		RestHandler.getInstance().addObserver(this);
+	}
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		RestHandler.getInstance().removeObserver(this);
+	}
+	
+	@Override
+	public void onDownloadImageDone(final File newImage) {
+		this.runOnUiThread(new Runnable() {
+			
+			@Override
+			public void run() {
+				MainActivity.this.displayImage(newImage);
+			}
+		});
 	}
 	
 	private void reloadImages() {

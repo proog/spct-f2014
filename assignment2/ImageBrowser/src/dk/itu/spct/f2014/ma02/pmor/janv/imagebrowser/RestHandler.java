@@ -5,9 +5,34 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RestHandler {
 	public static int restPort = 9000;
+	
+	private static final RestHandler singleton = new RestHandler();
+	
+	private final List<IRestHandlerObserver> observers = new ArrayList<>();
+	
+	/**
+	 * Private constructor due to singleton pattern.
+	 */
+	private RestHandler() {
+		
+	}
+	
+	public static RestHandler getInstance() {
+		return singleton;
+	}
+	
+	public void addObserver(IRestHandlerObserver obs) {
+		this.observers.add(obs);
+	}
+	
+	public void removeObserver(IRestHandlerObserver obs) {
+		this.observers.remove(obs);
+	}
 	
 	/**
 	 * Called by the SignalR server when this phone should download an image.
@@ -15,7 +40,7 @@ public class RestHandler {
 	 * @param f The file in which the data will be downloaded
 	 * @throws IOException If the connection could not be established.
 	 */
-	public static void downloadImage(URL url, File f) throws IOException {
+	public void downloadImage(URL url, File f) throws IOException {
 		InputStream input = url.openStream();
 		FileOutputStream output = new FileOutputStream(f);
 		
@@ -28,6 +53,9 @@ public class RestHandler {
 		output.flush();
 		output.close();
 		input.close();
+		for(IRestHandlerObserver obs : this.observers) {
+			obs.onDownloadImageDone(f);
+		}
 	}
 	
 	/**
