@@ -40,7 +40,7 @@ namespace SurfaceApp {
 		private void PhoneHubOnTagIdReceived(byte tagValue, string connectionId) {
 			Console.WriteLine("Received identification message: " + tagValue);
 			Phones[tagValue] = connectionId;
-			RequestAllImagesUploadToServer(tagValue, "/images/" + tagValue);
+			//RequestAllImagesUploadToServer(tagValue, "/images/" + tagValue);
 			//RequestImageDownloadToPhone(tagValue, "/images/20/app_chart.png", "app_chart.png");
 		}
 
@@ -54,15 +54,18 @@ namespace SurfaceApp {
 		}
 
 		public void RequestImageDownloadToPhone(byte phoneTag, string url, string filename) {
-			GlobalHost.ConnectionManager.GetHubContext<PhoneHub>().Clients.Client(Phones[phoneTag]).DownloadImageToPhone(url, filename);
+			if(Phones.ContainsKey(phoneTag))
+				GlobalHost.ConnectionManager.GetHubContext<PhoneHub>().Clients.Client(Phones[phoneTag]).DownloadImageToPhone(url, filename);
 		}
 
 		public void RequestImageUploadToServer(byte phoneTag, string postUrl, string filename) {
-			GlobalHost.ConnectionManager.GetHubContext<PhoneHub>().Clients.Client(Phones[phoneTag]).UploadImageToServer(postUrl, filename);
+			if(Phones.ContainsKey(phoneTag))
+				GlobalHost.ConnectionManager.GetHubContext<PhoneHub>().Clients.Client(Phones[phoneTag]).UploadImageToServer(postUrl, filename);
 		}
 
 		public void RequestAllImagesUploadToServer(byte phoneTag, string postUrl) {
-			GlobalHost.ConnectionManager.GetHubContext<PhoneHub>().Clients.Client(Phones[phoneTag]).UploadAllImagesToServer(postUrl);
+			if(Phones.ContainsKey(phoneTag))
+				GlobalHost.ConnectionManager.GetHubContext<PhoneHub>().Clients.Client(Phones[phoneTag]).UploadAllImagesToServer(postUrl);
 		}
 	}
 

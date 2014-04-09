@@ -115,14 +115,9 @@ namespace SurfaceApp
         {
             var visualizer = (TagVisualizer) sender;
             var visualization = (PhoneVisualization) e.TagVisualization;
-            long tagVal = visualization.VisualizedTag.Value;
-	        visualization.DeviceId = (byte) tagVal;
-
-	        // TODO maybe request the phone to upload all images here?
-
-
-
-	        // TODO call some sort of onTagAdded(tagVal) event handler
+			byte tagVal = (byte) visualization.VisualizedTag.Value;
+	        visualization.DeviceId = tagVal;
+			SignalR.GetInstance().RequestAllImagesUploadToServer(tagVal, "/images/" + tagVal);
         }
 
 		private void StackPanel_PreviewTouchDown_1(object sender, TouchEventArgs e) {
