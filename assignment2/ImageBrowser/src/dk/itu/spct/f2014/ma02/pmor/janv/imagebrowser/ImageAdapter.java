@@ -1,10 +1,8 @@
 package dk.itu.spct.f2014.ma02.pmor.janv.imagebrowser;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.view.View;
 import android.view.ViewGroup;

@@ -1,6 +1,7 @@
 package dk.itu.spct.f2014.ma02.pmor.janv.imagebrowser;
 
 import java.io.File;
+import java.lang.reflect.Method;
 
 import android.app.Activity;
 import android.net.Uri;
@@ -12,7 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements ITaskCallback<Boolean> {
 	private ImageAdapter imageAdapter;
 	private NetworkClient client;
 	
@@ -56,20 +57,29 @@ public class MainActivity extends Activity {
 		reloadImages();
 	}
 	
-	public void connectButtonClicked(final View view) {
+	public void connectButtonClicked(final View view) throws NoSuchMethodException {	
 		EditText ipBox = (EditText) findViewById(R.id.editTextServerIp);
 		EditText tagBox = (EditText) findViewById(R.id.editTextTagId);
 		client = new NetworkClient(ipBox.getText().toString(), Byte.parseByte(tagBox.getText().toString()));
-		client.connectSignalR();
-		
-		Button connectButton = (Button) view;
-		connectButton.setText("Disconnect");
-		connectButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				disconnectButtonClicked(view);
-			}
-		});
+		Method m = client.getClass().getMethod(NetworkClient.CONNECT_METHOD_NAME, null);
+		SignalrTask<Boolean> task = new SignalrTask<>(client, m, this);
+		task.execute(new Object[0]);
+	}
+	
+	@Override
+	public void onTaskCompleted(Method m, Boolean result) {
+		if(m.getName().equals(NetworkClient.CONNECT_METHOD_NAME) && result) {
+			Button connectButton = (Button) this.findViewById(R.id.connectButton);
+			connectButton.setText("Disconnect");
+			connectButton.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					disconnectButtonClicked(v);
+				}
+			});
+		} else if (m.getName().equals(NetworkClient.DISCONECT_METHOD_NAME) && result) {
+			
+		}
 	}
 	
 	public void disconnectButtonClicked(final View view) {
@@ -80,7 +90,12 @@ public class MainActivity extends Activity {
 		b.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				connectButtonClicked(view);
+				try {
+					connectButtonClicked(view);
+				} catch (NoSuchMethodException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 	}
