@@ -137,7 +137,9 @@ namespace SurfaceApp
 				             };
 			var devices = new List<InputDevice> {e.TouchDevice};
 			var dragSource = draggedItem;
+
 		    var imageInfo = cursor.Content;
+
 			SurfaceDragDrop.BeginDragDrop(dragSource, draggedItem, cursor, imageInfo, devices, DragDropEffects.Link);
 
 			e.Handled = true;

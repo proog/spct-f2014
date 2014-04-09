@@ -21,7 +21,7 @@
                     <DataTemplate>
                         <StackPanel PreviewTouchDown="StackPanel_PreviewTouchDown_1">
                             <Label Content="{Binding OriginId}"/>
-                            <Image Source="{Binding FilePath}"/>
+                            <Image Source="{Binding Image}" />
                         </StackPanel>
                     </DataTemplate>
                 </s:ScatterView.ItemTemplate>

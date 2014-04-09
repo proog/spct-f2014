@@ -51,7 +51,7 @@ namespace SurfaceApp
 				RemoveImage(info);
 			}
 
-			//Directory.Delete(IMG_DIR + b, true);
+			Directory.Delete(IMG_DIR + b, true);
 		}
 
 	    private void AddImage(ImageInfo info)
