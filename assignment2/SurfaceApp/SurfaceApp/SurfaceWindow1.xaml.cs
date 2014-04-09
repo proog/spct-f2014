@@ -128,8 +128,6 @@ namespace SurfaceApp
 		private void StackPanel_PreviewTouchDown_1(object sender, TouchEventArgs e) {
 			var draggedItem = e.OriginalSource as System.Windows.Controls.Image;
 
-			Console.WriteLine(e.OriginalSource);
-
 			if(draggedItem == null)
 				return;
 
@@ -140,7 +138,7 @@ namespace SurfaceApp
 			var devices = new List<InputDevice> {e.TouchDevice};
 			var dragSource = draggedItem;
 
-			var imageInfo = new ImageInfo(28, "dummy\\images\\28\\hille.jpg");
+		    var imageInfo = cursor.Content;
 
 			SurfaceDragDrop.BeginDragDrop(dragSource, draggedItem, cursor, imageInfo, devices, DragDropEffects.Link);
 
