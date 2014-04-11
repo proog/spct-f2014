@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -115,9 +116,12 @@ namespace SurfaceApp
         {
             var visualizer = (TagVisualizer) sender;
             var visualization = (PhoneVisualization) e.TagVisualization;
-			byte tagVal = (byte) visualization.VisualizedTag.Value;
+			var tagVal = (byte) visualization.VisualizedTag.Value;
 	        visualization.DeviceId = tagVal;
-			SignalR.GetInstance().RequestAllImagesUploadToServer(tagVal, "/images/" + tagVal);
+
+			// only request images if this phone hasn't already uploaded them previously
+			if(!Directory.Exists(ScatterViewViewModel.IMG_DIR + "\\" + tagVal))
+				SignalR.GetInstance().RequestAllImagesUploadToServer(tagVal, "/images/" + tagVal);
         }
 
 		private void StackPanel_PreviewTouchDown_1(object sender, TouchEventArgs e) {
