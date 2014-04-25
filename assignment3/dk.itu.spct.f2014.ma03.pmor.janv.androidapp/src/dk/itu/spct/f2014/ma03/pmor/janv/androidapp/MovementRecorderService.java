@@ -9,13 +9,16 @@ public class MovementRecorderService extends Service {
 
 	private final MovementRecorderServiceBinding binding = new MovementRecorderServiceBinding();
 	
+	// TODO overwrite onStartCommand!!
+	
 	@Override
 	public IBinder onBind(Intent intent) {
 		return this.binding;
 	}
 	
 	public class MovementRecorderServiceBinding extends Binder {
-		public void startRecording() {
+		
+		public void startRecording(RecordingType recordingType) {
 			// TODO start sensor.
 		}
 		

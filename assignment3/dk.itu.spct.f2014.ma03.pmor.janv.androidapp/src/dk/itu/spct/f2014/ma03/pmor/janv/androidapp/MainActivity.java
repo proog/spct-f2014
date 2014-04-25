@@ -17,6 +17,9 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Toast;
 import android.os.Build;
 
 public class MainActivity extends Activity {
@@ -135,6 +138,28 @@ public class MainActivity extends Activity {
 	}
 	
 	public void onStartRecordButtonClicked(View v) {
+		// Service availability check.
+		if(!bound) {
+			Toast.makeText(this, "The recording service is currently unavailable.", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		
+		// Start accelerometer recording service in case it was stopped.
+		this.startService(new Intent(this, MovementRecorderService.class));
+		
+		// Find out what type of recording the user wants to start.
+		RadioGroup radioGrp = (RadioGroup) this.findViewById(R.id.activityRadioGroup);
+		int selectedBtnId = radioGrp.getCheckedRadioButtonId();
+		RecordingType recordingType = this.getRecordingTypeFromRadioButton(selectedBtnId);
+		if(recordingType == null) {
+			// Make sure something was selected.
+			Toast.makeText(this, "Please select a recording type", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		// Tell the service to begin recording.
+		this.service.startRecording(recordingType);
+		
+		// Update button text and listener.
 		Button b = (Button) findViewById(R.id.recordButton);
 		b.setText(R.string.stop_recording);
 		b.setOnClickListener(new OnClickListener() {
@@ -143,8 +168,24 @@ public class MainActivity extends Activity {
 				onStopRecordButtonClicked(v);
 			}
 		});
-		
-		// start accelerometer recording service
+	}
+	
+	/**
+	 * Get the {@link RecordingType} that corresponds to a given {@link RadioButton} id.
+	 * @param selectedRadioButtonId The ID of the selected {@link RadioButton}.
+	 * @return The {@link RecordingType} corresponding to the given radio button or null if there is no match.
+	 */
+	private RecordingType getRecordingTypeFromRadioButton(int selectedRadioButtonId) {
+		switch(selectedRadioButtonId) {
+		case R.id.activitySitRadio:
+			return RecordingType.SITTING;
+		case R.id.activityWalkRadio:
+			return RecordingType.WALKING;
+		case R.id.activityStairsRadio:
+			return RecordingType.CLIMBING_STAIRS;
+		default:
+			return null;
+		}
 	}
 	
 	public void onStopRecordButtonClicked(View v) {
