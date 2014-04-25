@@ -14,18 +14,17 @@ public class MovementServletServlet extends HttpServlet {
 	
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-		
-		String output = "<!DOCTYPE html><html><body>";
-		
 		Query query = new Query("Measurement").addSort("timestamp", SortDirection.DESCENDING);
 		List<Entity> list = datastore.prepare(query).asList(FetchOptions.Builder.withDefaults());
 		
-		if (list.size() > 0) {
+		String output = "<!DOCTYPE html><html><body>";
+		
+		if (!list.isEmpty()) {
 			output = output + "<table>";
 			
-			for (int i = 0; i < list.size(); i++ ) {
-				output = output + "<tr><td>" + list.get(i).getProperty("timestamp").toString() + 
-						"</td><td>" + list.get(i).getProperty("elemvalue").toString() + "</td></tr>";
+			for (Entity e : list) {
+				output = output + "<tr><td>" + e.getProperty("timestamp").toString() + "</td><td>"
+											+ e.getProperty("elemvalue").toString() + "</td></tr>";
 			}
 			
 			output = output + "</table>";
@@ -35,16 +34,24 @@ public class MovementServletServlet extends HttpServlet {
 		}
 	    
 		output = output + "</body></html>";
-	    resp.setContentType("text/html");
+	    
+		resp.setContentType("text/html");
 	    resp.getWriter().println(output);
 	}
 
 	public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		String timestamp = req.getParameter("timestamp");
-		String elemvalue = req.getParameter("elemvalue");
+		String type = req.getParameter("type");
+		String xAxis = req.getParameter("x_acc");
+		String yAxis = req.getParameter("y_acc");
+		String zAxis = req.getParameter("z_acc");
+		
 		Entity measurement = new Entity("Measurement", parent.getKey());
 		measurement.setProperty("timestamp", timestamp);
-		measurement.setProperty("elemvalue", elemvalue);
+		measurement.setProperty("type", type);
+		measurement.setProperty("x_acc", xAxis);
+		measurement.setProperty("y_acc", yAxis);
+		measurement.setProperty("z_acc", zAxis);
 		
 		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 		datastore.put(measurement);
