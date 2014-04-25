@@ -230,7 +230,6 @@ public class MainActivity extends Activity {
 	
 	public void onUploadButtonClicked(View v) {
 		// upload all recording files to server
-		
 	}
 	
 	private void keepRecording(Recording r) {
@@ -250,7 +249,7 @@ public class MainActivity extends Activity {
 		
 		if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
 			String extFolder = Environment.getExternalStorageDirectory().getAbsolutePath();
-			File folder = new File(extFolder + "/" + "assignment3");
+			File folder = new File(extFolder + R.string.directory);
 			
 			File[] files = folder.listFiles();
 			for(File f : files) {

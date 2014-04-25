@@ -1,8 +1,11 @@
 package dk.itu.spct.f2014.ma03.pmor.janv.androidapp;
 
+import java.io.File;
+
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -39,7 +42,7 @@ public class MovementRecorderService extends Service {
 	}
 
 	// TODO overwrite onStartCommand?
-
+	
 	@Override
 	public IBinder onBind(Intent intent) {
 		return this.binding;
@@ -63,7 +66,9 @@ public class MovementRecorderService extends Service {
 			if (MovementRecorderService.this.recording) {
 				return;
 			}
-			// TODO start sensor.
+			MovementRecorderService.this.recorderThread = new RecorderThread(
+					recordingType);
+			MovementRecorderService.this.recorderThread.start();
 		}
 
 		/**
@@ -73,10 +78,34 @@ public class MovementRecorderService extends Service {
 			MovementRecorderService.this.recording = false;
 			// Stop recording by interrupting the RecorderThread.
 			MovementRecorderService.this.recorderThread.interrupt();
+			// Perform cleanup.
+			MovementRecorderService.this.recorderThread = null;
 		}
 	}
 
 	private class RecorderThread extends Thread {
+
+		/**
+		 * The type of the recording that is performed by this thread.
+		 */
+		private final RecordingType recordingType;
+
+		/**
+		 * Name of the file containing this recording.
+		 */
+		private final String fileName;
+		
+		/**
+		 * Create a new {@link RecorderThread}.
+		 * 
+		 * @param recordingType
+		 *            The type of the recording to be performed.
+		 */
+		public RecorderThread(RecordingType recordingType) {
+			this.fileName = System.currentTimeMillis() + "_" + recordingType + ".csv";
+			this.recordingType = recordingType;
+		}
+
 		@Override
 		public void run() {
 			// Keep recording until interrupted.
@@ -89,7 +118,17 @@ public class MovementRecorderService extends Service {
 							@Override
 							public void run() {
 								// TODO Code to write to file here...
-
+								// Check that external storage is available.
+								if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+									String extFolder = Environment.getExternalStorageDirectory().getAbsolutePath();
+									File folder = new File(extFolder + R.string.directory);
+									// Create dir if not already present.
+									folder.mkdirs();
+									File file = new File(folder + "/" + RecorderThread.this.fileName);
+									// TODO create file if not exists.
+									// TODO else append to file.
+									
+								}
 							}
 						});
 				try {
@@ -119,6 +158,7 @@ public class MovementRecorderService extends Service {
 	 * 
 	 */
 	private class FileWriterThread extends Thread {
+		
 		/**
 		 * Allows other threads to post work to this thread. The handler is
 		 * initialized in {@link FileWriterThread#run()} in order to associate

@@ -13,5 +13,5 @@
     <string name="save_question">Keep recording?</string>
     <string name="save">Keep</string>
     <string name="discard">Discard</string>
-
+	<string name="directory">/assignment3</string>
 </resources>
