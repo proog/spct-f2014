@@ -216,16 +216,29 @@ public class MainActivity extends Activity {
 		dBuilder.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				saveRecording(r);
+				keepRecording(r);
 			}
 		});
-		
-		ListView lv = (ListView) findViewById(R.id.recordingsListView);
+		dBuilder.setNegativeButton(R.string.discard, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				discardRecording(r);
+			}
+		});
+		dBuilder.create().show();
+	}
+	
+	public void onUploadButtonClicked(View v) {
+		// upload all recording files to server
 		
 	}
 	
-	private void saveRecording(Recording r) {
+	private void keepRecording(Recording r) {
 		refreshRecordingList();
+	}
+	
+	private void discardRecording(Recording r) {
+		//new File(r.fileName).delete();
 	}
 	
 	private void refreshRecordingList() {
@@ -251,9 +264,8 @@ public class MainActivity extends Activity {
 		String fileName = f.getName();
 		String[] split = fileName.split("_");
 		long timestamp = Long.parseLong(split[0]);
-		String label = split[1];
-		Object[] data = null;
+		RecordingType type = RecordingType.valueOf(split[1]);
 		
-		return new Recording(timestamp, label, data);
+		return new Recording(timestamp, type, f.getAbsolutePath());
 	}
 }

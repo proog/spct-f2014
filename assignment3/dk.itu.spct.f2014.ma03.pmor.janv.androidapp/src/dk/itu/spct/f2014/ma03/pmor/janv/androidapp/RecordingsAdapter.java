@@ -15,7 +15,6 @@ public class RecordingsAdapter extends BaseAdapter {
 	
 	public RecordingsAdapter(Context c) {
 		this.c = c;
-		recordings.add(new Recording(123, "walking", null));
 	}
 	
 	@Override
@@ -36,7 +35,7 @@ public class RecordingsAdapter extends BaseAdapter {
 	@Override
 	public View getView(int arg0, View arg1, ViewGroup arg2) {
 		TextView tv = new TextView(c);
-		tv.setText(recordings.get(arg0).label);
+		tv.setText(recordings.get(arg0).timestamp + ": " + recordings.get(arg0).type);
 		return tv;
 	}
 

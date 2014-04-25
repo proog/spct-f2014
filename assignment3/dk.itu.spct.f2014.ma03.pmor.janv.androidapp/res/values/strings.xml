@@ -10,8 +10,8 @@
     <string name="start_recording">Start recording</string>
     <string name="stop_recording">Stop recording</string>
     <string name="upload">Upload all</string>
-    <string name="save_question">Save recording?</string>
-    <string name="save">Save</string>
+    <string name="save_question">Keep recording?</string>
+    <string name="save">Keep</string>
     <string name="discard">Discard</string>
 
 </resources>

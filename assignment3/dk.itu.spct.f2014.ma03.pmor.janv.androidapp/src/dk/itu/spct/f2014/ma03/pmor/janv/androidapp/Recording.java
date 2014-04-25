@@ -2,12 +2,12 @@ package dk.itu.spct.f2014.ma03.pmor.janv.androidapp;
 
 public class Recording {
 	public final long timestamp;
-	public final String label;
-	public final Object[] data;
+	public final RecordingType type;
+	public final String fileName;
 	
-	public Recording(long t, String l, Object[] d) {
+	public Recording(long t, RecordingType l, String f) {
 		timestamp = t;
-		label = l;
-		data = d;
+		type = l;
+		fileName = f;
 	}
 }
