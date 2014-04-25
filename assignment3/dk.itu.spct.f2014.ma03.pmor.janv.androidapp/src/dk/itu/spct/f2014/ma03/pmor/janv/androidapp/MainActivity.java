@@ -1,17 +1,103 @@
 package dk.itu.spct.f2014.ma03.pmor.janv.androidapp;
 
+import dk.itu.spct.f2014.ma03.pmor.janv.androidapp.MovementRecorderService.MovementRecorderServiceBinding;
 import android.app.Activity;
-import android.app.ActionBar;
 import android.app.Fragment;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.os.Build;
 
 public class MainActivity extends Activity {
+
+	/**
+	 * Provides an interface for the {@link MovementRecorderService}.
+	 */
+	private MovementRecorderServiceBinding service;
+
+	/**
+	 * Specifies if this activity is currently bound to the
+	 * {@link MovementRecorderService}.
+	 */
+	private boolean bound = false;
+
+	/**
+	 * Service connection for connecting this activity to the
+	 * {@link MovementRecorderService}.
+	 */
+	private final ServiceConnection serviceConn = new ServiceConnection() {
+
+		/*
+		 * NOTE: These callbacks are run on the main thread.
+		 */
+
+		@Override
+		public void onServiceDisconnected(ComponentName arg0) {
+			MainActivity.this.bound = false;
+			MainActivity.this.service = null;
+		}
+
+		@Override
+		public void onServiceConnected(ComponentName classInfo,
+				IBinder serviceBinding) {
+			if (serviceBinding instanceof MovementRecorderServiceBinding) {
+				// Successfully bound to the movement service.
+				MainActivity.this.service = (MovementRecorderServiceBinding) serviceBinding;
+				MainActivity.this.bound = true;
+			}
+		}
+	};
+
+	/*
+	 * TODO add startService to "start recording" btn handler.
+	 */
+	
+	/*
+	 * TODO add stopService to "stop recording" btn handler.
+	 */
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void onStart() {
+		super.onStart();
+		/*
+		 * Start the service such that it will remain running even though the
+		 * activity is recreated (e.g. due to a configuration change).
+		 */
+		ComponentName serviceName = this.startService(new Intent(this,
+				MovementRecorderService.class));
+		assert serviceName != null;
+		/*
+		 * Bind to service to get an interface for the service. This interface
+		 * is delivered to the ServiceConnection implementation.
+		 */
+		Intent i = new Intent(this, MovementRecorderService.class);
+		this.bindService(i, this.serviceConn, Context.BIND_AUTO_CREATE);
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		if (bound) {
+			/*
+			 * Unbind from the service but do not stop the service. The service
+			 * is kept alive as the activity might be stopped while a recording
+			 * is taking place. Service should only be stopped by the
+			 * "stop recording" button handler.
+			 */
+			this.unbindService(this.serviceConn);
+			this.bound = false;
+		}
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
