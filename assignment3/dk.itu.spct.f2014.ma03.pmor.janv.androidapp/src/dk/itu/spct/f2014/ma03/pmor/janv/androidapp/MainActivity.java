@@ -1,14 +1,22 @@
 package dk.itu.spct.f2014.ma03.pmor.janv.androidapp;
 
+import java.io.File;
+
 import dk.itu.spct.f2014.ma03.pmor.janv.androidapp.MovementRecorderService.MovementRecorderServiceBinding;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.app.Fragment;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.IBinder;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,6 +24,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -61,6 +70,8 @@ public class MainActivity extends Activity {
 			}
 		}
 	};
+	
+	private RecordingsAdapter listAdapter = new RecordingsAdapter(this);
 
 	/*
 	 * TODO add startService to "start recording" btn handler.
@@ -111,10 +122,9 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		if (savedInstanceState == null) {
-			getFragmentManager().beginTransaction()
-					.add(R.id.container, new PlaceholderFragment()).commit();
-		}
+		// attach recordings adapter to the list view
+		ListView lv = (ListView) findViewById(R.id.recordingsListView);
+		lv.setAdapter(listAdapter);
 	}
 
 	@Override
@@ -199,31 +209,51 @@ public class MainActivity extends Activity {
 		});
 		
 		// stop accelerometer recording service and retrieve result
+		final Recording r = null;
+		
+		AlertDialog.Builder dBuilder = new Builder(this);
+		dBuilder.setMessage(R.string.save_question);
+		dBuilder.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				saveRecording(r);
+			}
+		});
 		
 		ListView lv = (ListView) findViewById(R.id.recordingsListView);
 		
 	}
-
-	/**
-	 * A placeholder fragment containing a simple view.
-	 */
-	public static class PlaceholderFragment extends Fragment {
-
-		public PlaceholderFragment() {
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_main, container,
-					false);
+	
+	private void saveRecording(Recording r) {
+		refreshRecordingList();
+	}
+	
+	private void refreshRecordingList() {
+		//this.listAdapter = new RecordingsAdapter(this);
+		//ListView gv = (ListView) this.findViewById(R.id.recordingsListView);
+		//gv.setAdapter(this.listAdapter);
+		
+		listAdapter.recordings.clear();
+		
+		if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+			String extFolder = Environment.getExternalStorageDirectory().getAbsolutePath();
+			File folder = new File(extFolder + "/" + "assignment3");
 			
-			// attach recordings adapter to the list view
-			ListView lv = (ListView) rootView.findViewById(R.id.recordingsListView);
-			lv.setAdapter(new RecordingsAdapter(lv.getContext()));
-			
-			return rootView;
+			File[] files = folder.listFiles();
+			for(File f : files) {
+				listAdapter.recordings.add(readRecordingFile(f));
+				listAdapter.notifyDataSetChanged();
+			}
 		}
 	}
-
+	
+	private static Recording readRecordingFile(File f) {
+		String fileName = f.getName();
+		String[] split = fileName.split("_");
+		long timestamp = Long.parseLong(split[0]);
+		String label = split[1];
+		Object[] data = null;
+		
+		return new Recording(timestamp, label, data);
+	}
 }
