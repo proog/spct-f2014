@@ -13,7 +13,11 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ListView;
+import android.os.Build;
 
 public class MainActivity extends Activity {
 
@@ -129,6 +133,35 @@ public class MainActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
+	
+	public void onStartRecordButtonClicked(View v) {
+		Button b = (Button) findViewById(R.id.recordButton);
+		b.setText(R.string.stop_recording);
+		b.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				onStopRecordButtonClicked(v);
+			}
+		});
+		
+		// start accelerometer recording service
+	}
+	
+	public void onStopRecordButtonClicked(View v) {
+		Button b = (Button) findViewById(R.id.recordButton);
+		b.setText(R.string.start_recording);
+		b.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				onStartRecordButtonClicked(v);
+			}
+		});
+		
+		// stop accelerometer recording service and retrieve result
+		
+		ListView lv = (ListView) findViewById(R.id.recordingsListView);
+		
+	}
 
 	/**
 	 * A placeholder fragment containing a simple view.
@@ -143,6 +176,11 @@ public class MainActivity extends Activity {
 				Bundle savedInstanceState) {
 			View rootView = inflater.inflate(R.layout.fragment_main, container,
 					false);
+			
+			// attach recordings adapter to the list view
+			ListView lv = (ListView) rootView.findViewById(R.id.recordingsListView);
+			lv.setAdapter(new RecordingsAdapter(lv.getContext()));
+			
 			return rootView;
 		}
 	}
