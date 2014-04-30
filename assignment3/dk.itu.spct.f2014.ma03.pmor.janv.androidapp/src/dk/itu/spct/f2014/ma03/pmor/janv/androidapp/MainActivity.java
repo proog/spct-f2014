@@ -209,6 +209,9 @@ public class MainActivity extends Activity {
 		});
 		
 		// stop accelerometer recording service and retrieve result
+		this.service.stopRecording();
+		
+		/*
 		final Recording r = null;
 		
 		AlertDialog.Builder dBuilder = new Builder(this);
@@ -226,6 +229,7 @@ public class MainActivity extends Activity {
 			}
 		});
 		dBuilder.create().show();
+		*/
 	}
 	
 	public void onUploadButtonClicked(View v) {
