@@ -19,32 +19,45 @@
         android:layout_height="wrap_content"
         android:text="@string/upload"
         android:onClick="onUploadButtonClicked" />
-
-    <RadioGroup
-        android:id="@+id/activityRadioGroup"
-        android:layout_width="wrap_content"
+    
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="50dp" >
 
-        <RadioButton
-            android:id="@+id/activityStairsRadio"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="@string/stairs" />
-
-        <RadioButton
-            android:id="@+id/activityWalkRadio"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/walking" />
-
-        <RadioButton
-            android:id="@+id/activitySitRadio"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/sitting" />
-    </RadioGroup>
+	    <RadioGroup
+	        android:id="@+id/activityRadioGroup"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content" >
+	
+	        <RadioButton
+	            android:id="@+id/activityStairsRadio"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:checked="true"
+	            android:text="@string/stairs" />
+	
+	        <RadioButton
+	            android:id="@+id/activityWalkRadio"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="@string/walking" />
+	
+	        <RadioButton
+	            android:id="@+id/activitySitRadio"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="@string/sitting" />
+	    </RadioGroup>
+	    
+	    <CheckBox
+	        android:id="@+id/testModeCheckbox"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/testmode" />
+	    
+    </LinearLayout>
 
     <Button
         android:id="@+id/recordButton"

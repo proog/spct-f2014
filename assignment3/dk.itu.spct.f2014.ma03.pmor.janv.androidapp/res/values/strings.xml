@@ -14,4 +14,5 @@
     <string name="save">Keep</string>
     <string name="discard">Discard</string>
 	<string name="directory">/assignment3</string>
+	<string name="testmode">Test mode</string>
 </resources>
