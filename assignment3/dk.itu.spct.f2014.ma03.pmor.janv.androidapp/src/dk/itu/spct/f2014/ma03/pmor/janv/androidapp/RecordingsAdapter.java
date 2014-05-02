@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -33,10 +34,18 @@ public class RecordingsAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public View getView(int arg0, View arg1, ViewGroup arg2) {
-		TextView tv = new TextView(c);
-		tv.setText(recordings.get(arg0).fileName);
-		return tv;
+	public View getView(int position, View convertView, ViewGroup parent) {
+		// reuse any existing view
+		if(convertView == null) {
+			// No existing view, inflate from resource.
+			LayoutInflater inflater = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			convertView = inflater.inflate(R.layout.recording_lv_item, null);
+		}
+		// Set the display text.
+		TextView tv = (TextView) convertView.findViewById(R.id.lbl_fileName);
+		tv.setText(recordings.get(position).fileName);
+		
+		return convertView;
 	}
 
 }
