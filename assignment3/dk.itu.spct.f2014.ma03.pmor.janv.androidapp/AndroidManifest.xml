@@ -7,7 +7,7 @@
     <uses-sdk
         android:minSdkVersion="19"
         android:targetSdkVersion="19" />
-    
+
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -18,6 +18,9 @@
         android:theme="@style/AppTheme" >
         <service
             android:name="dk.itu.spct.f2014.ma03.pmor.janv.androidapp.MovementRecorderService"
+            android:exported="false" />
+        <service
+            android:name="dk.itu.spct.f2014.ma03.pmor.janv.androidapp.FileUploadService"
             android:exported="false" />
 
         <activity

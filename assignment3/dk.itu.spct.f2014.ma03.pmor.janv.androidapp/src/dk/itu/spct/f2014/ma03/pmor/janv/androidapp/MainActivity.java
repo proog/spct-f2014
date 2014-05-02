@@ -241,10 +241,14 @@ public class MainActivity extends Activity {
 //		List<String> fileNames = new ArrayList<String>();
 		int toUpload = 0;
 		for(int i = 0; i < listAdapter.getCount(); i++) {
-			if(listAdapter.recordings.get(i).isChecked())
+			Recording recording = listAdapter.recordings.get(i);
+			if(recording.isChecked()) {
 				toUpload++;
+				// TODO update with checkbox value.
+				startFileUpload(recording, true);
+			}
 		}
-		Toast.makeText(this, "You selected a total of " + toUpload + " files for upload...", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, "You selected a total of " + toUpload + " files for upload...", Toast.LENGTH_SHORT).show();
 //		// Find files that were "checked" for upload.
 //		int count = this.recordingsListView.getChildCount();
 //		for(int i = 0; i < count; i++) {
@@ -258,6 +262,14 @@ public class MainActivity extends Activity {
 //			}
 //		}
 		
+	}
+	
+	private void startFileUpload(Recording r, boolean training) {
+		Intent i = new Intent(this, FileUploadService.class);
+		String filePath = this.filesDir + "/" + r.fileName;
+		i.putExtra(FileUploadService.EXTRA_FILE_ABS_PATH, filePath);
+		i.putExtra(FileUploadService.EXTRA_TRAINING_MODE, training);
+		this.startService(i);
 	}
 	
 	private void keepRecording(Recording r) {
