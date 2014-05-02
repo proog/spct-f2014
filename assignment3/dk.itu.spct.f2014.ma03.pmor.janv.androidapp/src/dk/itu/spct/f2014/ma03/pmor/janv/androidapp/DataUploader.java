@@ -33,7 +33,7 @@ public class DataUploader {
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 		String line;
 		while((line = reader.readLine()) != null) {
-			dos.writeBytes(line);
+			dos.writeBytes(line + "\n");
 		}
 		reader.close();
 		dos.flush();
