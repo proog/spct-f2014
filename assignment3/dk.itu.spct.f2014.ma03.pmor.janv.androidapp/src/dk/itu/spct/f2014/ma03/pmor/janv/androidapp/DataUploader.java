@@ -27,6 +27,7 @@ public class DataUploader {
 		dos.writeUTF(post.toString());
 		dos.flush();
 		dos.close();
+		con.getInputStream().close();
 		con.disconnect();
 	}
 }

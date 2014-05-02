@@ -33,8 +33,10 @@ public class MovementServletServlet extends HttpServlet {
 			Query q = new Query("TestRecording").setFilter(new FilterPredicate(idName, FilterOperator.EQUAL, id));
 			List<Entity> list = datastore.prepare(q).asList(FetchOptions.Builder.withDefaults());
 			
-			for(Entity e : list)
-				resp.getWriter().println(e.getProperty(uploadName));
+			for(int i = list.size()-1; i > -1; i--) {
+				resp.getWriter().println(list.get(i).getProperty(uploadName));
+				break;
+			}
 		}
 		else {
 			Query q = new Query("TrainingRecording");
