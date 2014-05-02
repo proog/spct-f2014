@@ -9,36 +9,39 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.DefaultHttpRequestFactory;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 
 public class DataUploader {
-	private static String host =  "http://pmorjanv.appspot.com/movementservlet";
+	private static String host = "http://pmorjanv.appspot.com/movementservlet";
 	
 	public static void postData(File file, boolean trainingMode) throws IOException {
-		String id = file.getName();
-		StringBuilder post = new StringBuilder();
-		post.append("mode=").append(trainingMode ? "training" : "test").append("&id").append(id).append("&data=");
+		HttpClient client = new DefaultHttpClient();
+		HttpPost httpPost = new HttpPost(host);
 		
-		URL url = new URL(host);
-		HttpURLConnection con = (HttpURLConnection) url.openConnection();
-		con.setDoOutput(true);
-		con.setDoInput(true);
-		con.setRequestMethod("POST");
-		con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-		con.setRequestProperty("charset", "utf-8");
-		con.setRequestProperty("Content-Length", Long.toString(post.length() + file.length()));
-		con.connect();
-		DataOutputStream dos = new DataOutputStream(con.getOutputStream());
-		dos.writeBytes(post.toString());
-		
+		StringBuilder data = new StringBuilder();
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 		String line;
-		while((line = reader.readLine()) != null) {
-			dos.writeBytes(line + "\n");
-		}
+		while((line = reader.readLine()) != null)
+			data.append(line + "\n");
 		reader.close();
-		dos.flush();
-		dos.close();
-		con.getInputStream().close();
-		con.disconnect();
+		
+		List<NameValuePair> pairs = new ArrayList<>();
+		pairs.add(new BasicNameValuePair("mode", trainingMode ? "training" : "test"));
+		pairs.add(new BasicNameValuePair("id", file.getName()));
+		pairs.add(new BasicNameValuePair("data", data.toString()));
+		
+		httpPost.setEntity(new UrlEncodedFormEntity(pairs));
+		client.execute(httpPost);
 	}
 }

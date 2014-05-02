@@ -9,10 +9,10 @@
     <string name="sitting">Sitting on a chair</string>
     <string name="start_recording">Start recording</string>
     <string name="stop_recording">Stop recording</string>
-    <string name="upload">Upload all</string>
+    <string name="upload">Upload selected</string>
     <string name="save_question">Keep recording?</string>
     <string name="save">Keep</string>
     <string name="discard">Discard</string>
 	<string name="directory">/assignment3</string>
-	<string name="testmode">Test mode</string>
+	<string name="testmode">Upload as test data</string>
 </resources>

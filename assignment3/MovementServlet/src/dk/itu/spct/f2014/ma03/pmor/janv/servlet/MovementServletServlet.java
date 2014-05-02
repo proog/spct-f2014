@@ -14,6 +14,7 @@ import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
+import com.google.appengine.api.datastore.Text;
 
 @SuppressWarnings("serial")
 public class MovementServletServlet extends HttpServlet {
@@ -27,6 +28,7 @@ public class MovementServletServlet extends HttpServlet {
 	
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+		resp.setContentType("text/plain");
 		
 		String id = req.getParameter(idName);
 		if(id != null && !id.isEmpty()) {
@@ -34,7 +36,8 @@ public class MovementServletServlet extends HttpServlet {
 			List<Entity> list = datastore.prepare(q).asList(FetchOptions.Builder.withDefaults());
 			
 			for(int i = list.size()-1; i > -1; i--) {
-				resp.getWriter().println(list.get(i).getProperty(uploadName));
+				Text t = (Text) list.get(i).getProperty(uploadName);
+				resp.getWriter().println(t.getValue());
 				break;
 			}
 		}
@@ -44,7 +47,8 @@ public class MovementServletServlet extends HttpServlet {
 			
 			int count = 0;
 			for(Entity e : list) {
-				String data = e.getProperty(uploadName).toString();
+				Text t = (Text) e.getProperty(uploadName);
+				String data = t.getValue();
 				String[] lines = data.split("\n");
 				int start = count == 0 ? 0 : 1;
 				for(int i = start; i < lines.length; i++)
@@ -68,7 +72,7 @@ public class MovementServletServlet extends HttpServlet {
 		
 		String data = req.getParameter(uploadName);
 		e.setProperty("id", req.getParameter(idName));
-		e.setProperty("data", data);
+		e.setProperty("data", new Text(data));
 		datastore.put(e);
 	}
 	

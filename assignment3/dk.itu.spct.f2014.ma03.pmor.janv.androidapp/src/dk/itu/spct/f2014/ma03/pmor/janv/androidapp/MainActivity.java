@@ -244,8 +244,8 @@ public class MainActivity extends Activity {
 			Recording recording = listAdapter.recordings.get(i);
 			if(recording.isChecked()) {
 				toUpload++;
-				// TODO update with checkbox value.
-				startFileUpload(recording, true);
+				boolean training = !((CheckBox) findViewById(R.id.testModeCheckbox)).isChecked();
+				startFileUpload(recording, training);
 			}
 		}
 		Toast.makeText(this, "You selected a total of " + toUpload + " files for upload...", Toast.LENGTH_SHORT).show();
@@ -289,6 +289,8 @@ public class MainActivity extends Activity {
 		
 		if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
 			File folder = new File(this.filesDir);
+			if(!folder.exists())
+				folder.mkdirs();
 			
 			File[] files = folder.listFiles();
 			for(File f : files) {
