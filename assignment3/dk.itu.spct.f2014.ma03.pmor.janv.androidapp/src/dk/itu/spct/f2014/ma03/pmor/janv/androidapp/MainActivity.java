@@ -100,8 +100,10 @@ public class MainActivity extends Activity {
 		 */
 		Intent i = new Intent(this, MovementRecorderService.class);
 		this.bindService(i, this.serviceConn, Context.BIND_AUTO_CREATE);
+		// refresh recording list on start up.
+		this.refreshRecordingList();
 	}
-
+	
 	@Override
 	protected void onStop() {
 		super.onStop();
