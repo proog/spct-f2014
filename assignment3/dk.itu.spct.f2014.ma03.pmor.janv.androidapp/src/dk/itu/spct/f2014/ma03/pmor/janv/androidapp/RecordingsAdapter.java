@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 public class RecordingsAdapter extends BaseAdapter {
@@ -34,7 +36,7 @@ public class RecordingsAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
+	public View getView(final int position, View convertView, ViewGroup parent) {
 		// reuse any existing view
 		if(convertView == null) {
 			// No existing view, inflate from resource.
@@ -44,7 +46,16 @@ public class RecordingsAdapter extends BaseAdapter {
 		// Set the display text.
 		TextView tv = (TextView) convertView.findViewById(R.id.lbl_fileName);
 		tv.setText(recordings.get(position).fileName);
-		
+		// Associate checkbox with data item.
+		CheckBox chk_upload = (CheckBox) convertView.findViewById(R.id.chk_upload);
+		chk_upload.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean checked) {
+				RecordingsAdapter.this.recordings.get(position).setChecked(checked);
+			}
+		});
+		chk_upload.setChecked(recordings.get(position).isChecked());
 		return convertView;
 	}
 

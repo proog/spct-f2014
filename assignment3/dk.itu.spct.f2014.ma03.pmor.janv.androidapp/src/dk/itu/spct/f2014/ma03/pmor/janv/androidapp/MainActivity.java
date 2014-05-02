@@ -1,6 +1,8 @@
 package dk.itu.spct.f2014.ma03.pmor.janv.androidapp;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import dk.itu.spct.f2014.ma03.pmor.janv.androidapp.MovementRecorderService.MovementRecorderServiceBinding;
 import android.app.Activity;
@@ -24,6 +26,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.RadioButton;
@@ -75,7 +78,7 @@ public class MainActivity extends Activity {
 	
 	private RecordingsAdapter listAdapter = new RecordingsAdapter(this);
 	
-	
+	private ListView recordingsListView;
 	
 	/*
 	 * TODO add stopService to "stop recording" btn handler.
@@ -126,8 +129,8 @@ public class MainActivity extends Activity {
 		this.filesDir = this.getExternalFilesDir(null).getAbsolutePath() + this.getString(R.string.directory);
 
 		// attach recordings adapter to the list view
-		ListView lv = (ListView) findViewById(R.id.recordingsListView);
-		lv.setAdapter(listAdapter);
+		this.recordingsListView = (ListView) findViewById(R.id.recordingsListView);
+		this.recordingsListView.setAdapter(listAdapter);
 	}
 
 	@Override
@@ -235,7 +238,26 @@ public class MainActivity extends Activity {
 	}
 	
 	public void onUploadButtonClicked(View v) {
-		// upload all recording files to server
+//		List<String> fileNames = new ArrayList<String>();
+		int toUpload = 0;
+		for(int i = 0; i < listAdapter.getCount(); i++) {
+			if(listAdapter.recordings.get(i).isChecked())
+				toUpload++;
+		}
+		Toast.makeText(this, "You selected a total of " + toUpload + " files for upload...", Toast.LENGTH_LONG).show();
+//		// Find files that were "checked" for upload.
+//		int count = this.recordingsListView.getChildCount();
+//		for(int i = 0; i < count; i++) {
+//			View child = this.recordingsListView.getChildAt(i);
+//			View chkbox = child.findViewById(R.id.chk_upload);
+//			if(chkbox instanceof CheckBox) {
+//				CheckBox chk_upload = (CheckBox) chkbox;
+//				chk_upload.isChecked();
+//				fileNames.add();
+//				
+//			}
+//		}
+		
 	}
 	
 	private void keepRecording(Recording r) {
