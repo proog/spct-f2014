@@ -110,7 +110,7 @@ public class MovementRecorderService extends Service implements SensorEventListe
 			MovementRecorderService.this.recordingType = recordingType;
 			MovementRecorderService.this.batchCount = 0;
 			// Generate filename.
-			MovementRecorderService.this.currentFile = System.currentTimeMillis() + "_" + recordingType + ".csv";
+			MovementRecorderService.this.currentFile = System.currentTimeMillis() + "_" + recordingType + "_.csv";
 			/*
 			 *  Start listening for sensor readings.
 			 *  Note this version makes the listener method run on the main thread.
@@ -126,22 +126,22 @@ public class MovementRecorderService extends Service implements SensorEventListe
 		/**
 		 * Stop any current recording.
 		 */
-		public void stopRecording() {
+		public Recording stopRecording() {
 			// Deactivate sensor.
 			MovementRecorderService.this.sensorManager.unregisterListener(MovementRecorderService.this);
 			
 			// No longer recording.
 			MovementRecorderService.this.recording = false;
 			
+			// Produce model object for this recording.
+			Recording recording = new Recording(MovementRecorderService.this.recordingType, MovementRecorderService.this.currentFile);
+			
 			// Perform cleanup.
 			MovementRecorderService.this.recordingType = null;
 			MovementRecorderService.this.currentFile = null;
 			MovementRecorderService.this.batchCount = 0;
 			
-//			// Stop recording by interrupting the RecorderThread.
-//			MovementRecorderService.this.recorderThread.interrupt();
-//			MovementRecorderService.this.recorderThread = null;
-			
+			return recording;
 		}
 	}
 
@@ -327,7 +327,7 @@ public class MovementRecorderService extends Service implements SensorEventListe
 							// Init writer.
 							writer = (new FileWriter(file, false));
 							// Create headers.
-							writer.write("timestamp; x; y; z;" + newLine);
+							writer.write("timestamp;x;y;z;label" + newLine);
 						}
 						else {
 							// File should exist, headers should already be present.
@@ -335,7 +335,7 @@ public class MovementRecorderService extends Service implements SensorEventListe
 							writer = (new FileWriter(file, true));
 						}
 						for(SensorEvent evt : this.batch) {
-							writer.write(evt.timestamp + "; " + evt.values[0] + "; " + evt.values[1] + "; " + evt.values[2] + ";" + newLine);
+							writer.write(evt.timestamp + ";" + evt.values[0] + ";" + evt.values[1] + ";" + evt.values[2] + ";" + MovementRecorderService.this.recordingType + newLine);
 						}
 					}
 				} catch(IOException ioe) {

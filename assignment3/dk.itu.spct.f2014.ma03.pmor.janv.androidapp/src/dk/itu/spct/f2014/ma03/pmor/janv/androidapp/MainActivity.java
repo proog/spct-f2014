@@ -33,6 +33,8 @@ import android.os.Build;
 
 public class MainActivity extends Activity {
 
+	private String filesDir;
+	
 	/**
 	 * Provides an interface for the {@link MovementRecorderService}.
 	 */
@@ -72,10 +74,8 @@ public class MainActivity extends Activity {
 	};
 	
 	private RecordingsAdapter listAdapter = new RecordingsAdapter(this);
-
-	/*
-	 * TODO add startService to "start recording" btn handler.
-	 */
+	
+	
 	
 	/*
 	 * TODO add stopService to "stop recording" btn handler.
@@ -121,6 +121,7 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		this.filesDir = this.getExternalFilesDir(null).getAbsolutePath() + this.getString(R.string.directory);
 
 		// attach recordings adapter to the list view
 		ListView lv = (ListView) findViewById(R.id.recordingsListView);
@@ -192,7 +193,7 @@ public class MainActivity extends Activity {
 		case R.id.activityWalkRadio:
 			return RecordingType.WALKING;
 		case R.id.activityStairsRadio:
-			return RecordingType.CLIMBING_STAIRS;
+			return RecordingType.CLIMBING;
 		default:
 			return null;
 		}
@@ -209,10 +210,7 @@ public class MainActivity extends Activity {
 		});
 		
 		// stop accelerometer recording service and retrieve result
-		this.service.stopRecording();
-		
-		/*
-		final Recording r = null;
+		final Recording r = this.service.stopRecording();
 		
 		AlertDialog.Builder dBuilder = new Builder(this);
 		dBuilder.setMessage(R.string.save_question);
@@ -225,11 +223,13 @@ public class MainActivity extends Activity {
 		dBuilder.setNegativeButton(R.string.discard, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				discardRecording(r);
+				boolean deleted = discardRecording(r);
+				String toast = deleted ? "Recording deleted" : "Error: could not delete recording";
+				Toast.makeText(MainActivity.this, toast, Toast.LENGTH_SHORT).show();
 			}
 		});
 		dBuilder.create().show();
-		*/
+		
 	}
 	
 	public void onUploadButtonClicked(View v) {
@@ -240,8 +240,8 @@ public class MainActivity extends Activity {
 		refreshRecordingList();
 	}
 	
-	private void discardRecording(Recording r) {
-		//new File(r.fileName).delete();
+	private boolean discardRecording(Recording r) {
+		return new File(filesDir + "/" + r.fileName).delete();
 	}
 	
 	private void refreshRecordingList() {
@@ -252,23 +252,21 @@ public class MainActivity extends Activity {
 		listAdapter.recordings.clear();
 		
 		if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-			String extFolder = Environment.getExternalStorageDirectory().getAbsolutePath();
-			File folder = new File(extFolder + R.string.directory);
+			File folder = new File(this.filesDir);
 			
 			File[] files = folder.listFiles();
 			for(File f : files) {
 				listAdapter.recordings.add(readRecordingFile(f));
-				listAdapter.notifyDataSetChanged();
 			}
+			listAdapter.notifyDataSetChanged();
 		}
 	}
 	
 	private static Recording readRecordingFile(File f) {
 		String fileName = f.getName();
 		String[] split = fileName.split("_");
-		long timestamp = Long.parseLong(split[0]);
 		RecordingType type = RecordingType.valueOf(split[1]);
 		
-		return new Recording(timestamp, type, f.getAbsolutePath());
+		return new Recording(type, fileName);
 	}
 }

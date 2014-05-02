@@ -24,7 +24,7 @@ public class RecordingsAdapter extends BaseAdapter {
 
 	@Override
 	public Object getItem(int arg0) {
-		return null;
+		return recordings.get(arg0);
 	}
 
 	@Override
@@ -35,7 +35,7 @@ public class RecordingsAdapter extends BaseAdapter {
 	@Override
 	public View getView(int arg0, View arg1, ViewGroup arg2) {
 		TextView tv = new TextView(c);
-		tv.setText(recordings.get(arg0).timestamp + ": " + recordings.get(arg0).type);
+		tv.setText(recordings.get(arg0).fileName);
 		return tv;
 	}
 
