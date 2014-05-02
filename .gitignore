@@ -1,1 +1,3 @@
 *.suo
+assignment3/MovementServlet/war/WEB-INF/appengine-generated/datastore-indexes-auto.xml
+assignment3/MovementServlet/war/WEB-INF/appengine-generated/local_db.bin
