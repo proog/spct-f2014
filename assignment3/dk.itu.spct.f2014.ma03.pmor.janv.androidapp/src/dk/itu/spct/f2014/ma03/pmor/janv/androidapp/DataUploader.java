@@ -24,7 +24,7 @@ public class DataUploader {
 		con.setRequestProperty("Content-Length", Integer.toString(post.length()));
 		con.connect();
 		DataOutputStream dos = new DataOutputStream(con.getOutputStream());
-		dos.writeUTF(post.toString());
+		dos.writeBytes(post.toString());
 		dos.flush();
 		dos.close();
 		con.getInputStream().close();
