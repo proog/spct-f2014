@@ -1,11 +1,16 @@
 package dk.itu.spct.f2014.ma03.pmor.janv.androidapp;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.io.input.ReversedLinesFileReader;
 
 import android.app.Service;
 import android.content.Context;
@@ -20,15 +25,37 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
 public class MovementRecorderService extends Service implements SensorEventListener {
 
+	/**
+	 * Separator for separating values in .csv files.
+	 */
+	public static final String ITEM_SEPARATOR = ";";
+	
+	/**
+	 * Minimum number of nanoseconds to remove from end of file (to remove noise).
+	 * 5 seconds.
+	 */
+	private static final long truncateNanos = 5000000000L;
+	
+	/**
+	 * Tag used when logging file read errors.
+	 */
+	private static final String fileReadErrorTag = "file_error_read";
+	
+	/**
+	 * Tag used when lgging file write errors.
+	 */
+	private static final String fileWriteErrorTag = "file_error_write";
+	
 	private final MovementRecorderServiceBinding binding = new MovementRecorderServiceBinding();
 
 	/**
-	 * Thread performing the current recording.
+	 * The directory where the recordings are stored.
 	 */
-	private RecorderThread recorderThread;
+	private String filesDir;
 
 	/**
 	 * Is the service currently recording movement?
@@ -65,6 +92,8 @@ public class MovementRecorderService extends Service implements SensorEventListe
 	 */
 	private Sensor accelerometer;
 	
+	private int lineCountWithNoise;
+	
 	private static final String newLine = System.getProperty("line.separator");
 	
 	@Override
@@ -78,6 +107,7 @@ public class MovementRecorderService extends Service implements SensorEventListe
 		this.fileWriterThread.start();
 		this.sensorManager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
 		this.accelerometer = this.sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+		this.filesDir = this.getExternalFilesDir(null).getAbsolutePath() + this.getString(R.string.directory);
 	}
 
 	// TODO overwrite onStartCommand?
@@ -109,6 +139,7 @@ public class MovementRecorderService extends Service implements SensorEventListe
 			MovementRecorderService.this.recording = true;
 			MovementRecorderService.this.recordingType = recordingType;
 			MovementRecorderService.this.batchCount = 0;
+			MovementRecorderService.this.lineCountWithNoise = 0;
 			// Generate filename.
 			MovementRecorderService.this.currentFile = System.currentTimeMillis() + "_" + recordingType + "_.csv";
 			/*
@@ -130,11 +161,39 @@ public class MovementRecorderService extends Service implements SensorEventListe
 			// Deactivate sensor.
 			MovementRecorderService.this.sensorManager.unregisterListener(MovementRecorderService.this);
 			
+			
+			
+			// Write any data accumulated in the "buffer".
+			MovementRecorderService.this.writeBatchToFile();
+			
 			// No longer recording.
 			MovementRecorderService.this.recording = false;
 			
 			// Produce model object for this recording.
-			Recording recording = new Recording(MovementRecorderService.this.recordingType, MovementRecorderService.this.currentFile);
+			final Recording recording = new Recording(MovementRecorderService.this.recordingType, MovementRecorderService.this.currentFile);
+			
+			// Post job to remove noisy data from end of file.
+			MovementRecorderService.this.fileWriterThread.handler.post(new Runnable() {
+				@Override
+				public void run() {
+					Log.d("file length", "File length with noise: " + MovementRecorderService.this.lineCountWithNoise + " lines.");
+					MovementRecorderService.this.lineCountWithNoise = 0;
+					
+					boolean noiseRemoved = MovementRecorderService.this.postProcessRecording(recording);
+					if(!noiseRemoved) {
+						// If we could not remove noise, we discard the recording.
+						File f = new File(MovementRecorderService.this.filesDir + "/" + recording.fileName);
+						boolean deleted = f.delete();
+						Log.d("stopRecording()", "recording automatically deleted: " + deleted);
+						if(deleted) {
+							Toast.makeText(MovementRecorderService.this,
+									"Your recording was too short and hence automatically deleted. A recording must be at least "
+											+ truncateNanos / 1000000000L + " seconds long.",  Toast.LENGTH_LONG)
+									.show();
+						}
+					}
+				}
+			});
 			
 			// Perform cleanup.
 			MovementRecorderService.this.recordingType = null;
@@ -145,70 +204,164 @@ public class MovementRecorderService extends Service implements SensorEventListe
 		}
 	}
 
-	private class RecorderThread extends Thread {
-
-		/**
-		 * The type of the recording that is performed by this thread.
-		 */
-		private final RecordingType recordingType;
-
-		/**
-		 * Name of the file containing this recording.
-		 */
-		private final String fileName;
-		
-		/**
-		 * Create a new {@link RecorderThread}.
-		 * 
-		 * @param recordingType
-		 *            The type of the recording to be performed.
-		 */
-		public RecorderThread(RecordingType recordingType) {
-			this.fileName = System.currentTimeMillis() + "_" + recordingType + ".csv";
-			this.recordingType = recordingType;
-		}
-
-		@Override
-		public void run() {
-			// Keep recording until interrupted.
-			while (!this.isInterrupted()) {
-				// TODO get sensor data.
-				// TODO post reading to file writer thread.
-				MovementRecorderService.this.fileWriterThread.handler
-						.post(new Runnable() {
-
-							@Override
-							public void run() {
-								// TODO Code to write to file here...
-								// Check that external storage is available.
-								if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-									String extFolder = Environment.getExternalStorageDirectory().getAbsolutePath();
-									File folder = new File(extFolder + R.string.directory);
-									// Create dir if not already present.
-									folder.mkdirs();
-									File file = new File(folder + "/" + RecorderThread.this.fileName);
-									// TODO create file if not exists.
-									// TODO else append to file.
-									
-								}
-							}
-						});
+	private boolean postProcessRecording(Recording r) {
+		File origFile = new File(this.filesDir + "/" + r.fileName);
+		// Reads original file from end to front.
+		ReversedLinesFileReader reader = null;
+		String lastLine;
+		String[] lastLineParts;
+		// Final line to be included in post processed file.
+		String finalLine = null;
+		// Current read line.
+		String line = null;
+		try {
+			reader = new ReversedLinesFileReader(origFile, 4096, "UTF-8");
+			lastLine = reader.readLine();
+			if(lastLine == null) {
+				// No data in file.
+				return false;
+			}
+			lastLineParts = lastLine.split(ITEM_SEPARATOR);
+			// Read timestamp for last line.
+			Long lastLineTimestamp = null;
+			try {
+				lastLineTimestamp = Long.parseLong(lastLineParts[0]);	
+			} catch(NumberFormatException nfe) {
+				/*
+				 * This implies that the only data in the file is the header line.
+				 */
+				return false;
+			}
+			/*
+			 * Now ready to read line by line in reverse until we find a line with an early-enough timestamp.
+			 */
+			while((line = reader.readLine()) != null) {
+				String[] parts = line.split(ITEM_SEPARATOR);
+				Long lineTimestamp = null;
 				try {
+					lineTimestamp = Long.parseLong(parts[0]);	
+				} catch(NumberFormatException nfe) {
 					/*
-					 * Perform readings at 20Hz (i.e. one reading every 0.05
-					 * second).
+					 * This implies that we have reached the header line (the first line in the file).
+					 * Hence there is not enough data in the file to discard noise.
 					 */
-					Thread.sleep(50);
-				} catch (InterruptedException e) {
-					Log.d(this.getClass().getSimpleName(), this.getClass()
-							.getSimpleName()
-							+ " was interrupted while sleeping!");
-					continue;
+					return false;
+				}
+				if(lastLineTimestamp - lineTimestamp >= truncateNanos) {
+					// Found a sufficient gap to remove.
+					// We log what is to be the final line.
+					finalLine = line;
+					break;
 				}
 			}
+		} catch (IOException e) {
+			Log.e(fileReadErrorTag, "error when reading original file in reverse mode");
+			return false;
+		} finally {
+			// Free resources.
+			try {
+				if(reader != null) {					
+					reader.close();
+					Log.d(ReversedLinesFileReader.class.getSimpleName(), "successfully closed " + ReversedLinesFileReader.class.getSimpleName());
+				}
+			} catch (IOException e) {
+				// Too bad.
+				Log.e(fileReadErrorTag, "could not close " + ReversedLinesFileReader.class.getSimpleName());
+			}
 		}
+		
+		// We now have the final line to include in the final file.
+		// Create a temp file.
+		File temp;
+		try {
+			temp = File.createTempFile(origFile.getName(), "tmp");
+		} catch (IOException e) {
+			Log.e(fileWriteErrorTag, "could not create temp file");
+			return false;
+		}
+		// Create writer for temp file and regular reader for original file.
+		BufferedWriter tmpWriter = null;
+		BufferedReader origReader = null;
+		try {
+			origReader = new BufferedReader(new FileReader(origFile));
+			tmpWriter = new BufferedWriter(new FileWriter(temp));
+		} catch (FileNotFoundException e) {
+			Log.e(fileReadErrorTag, "could not create regular reader for original file");
+			return false;
+		} catch (IOException e) {
+			Log.e(fileWriteErrorTag, "could not create Writer for temp file");
+			if(origReader != null) {
+				try {
+					origReader.close();
+				} catch (IOException e1) {
+					Log.e(fileReadErrorTag, "error closing origReader");
+				}
+			}
+			return false;
+		}
+		// Now ready to copy to temp file.
+		try {
+			line = null;
+			while((line = origReader.readLine()) != null) {
+				// Write current line to temp file.
+				tmpWriter.write(line + newLine);
+				if(line.equals(finalLine)) {
+					// Found final line to include.
+					break;
+				}
+			}
+		} catch(IOException ioe) {
+			Log.e(fileWriteErrorTag, "error when copying original file to temp file");
+			return false;
+		} finally {
+			try {
+				if(tmpWriter != null) {
+					tmpWriter.flush();
+					tmpWriter.close();
+				}
+				if(origReader != null) {
+					origReader.close();
+				}
+			} catch (IOException e) {
+				Log.e(fileWriteErrorTag, "error when cleaning up after copying to temp file");
+			}
+		}
+		BufferedWriter origWriter = null;
+		BufferedReader tmpReader = null;
+		try {
+			// Create writer that overwrites content of original file.
+			origWriter = new BufferedWriter(new FileWriter(origFile, false));
+			// Create reader for temp file.
+			tmpReader = new BufferedReader(new FileReader(temp));
+			line = null;
+			int lineCountNoNoise = 0;
+			while((line = tmpReader.readLine()) != null) {
+				origWriter.write(line + newLine);
+				lineCountNoNoise++;
+			}
+			Log.d("file length", "File length after removing noise: " + lineCountNoNoise + " lines.");
+		} catch(IOException ioe) {
+			Log.e(fileWriteErrorTag, "error when copying temp file data to original file");
+			return false;
+		} finally {
+			try {
+				if(origWriter != null) {
+					origWriter.flush();
+					origWriter.close();
+				}
+				if(tmpReader != null) {
+					tmpReader.close();
+				}
+			} catch(IOException ioe) {
+				Log.e(fileWriteErrorTag, "error when cleaning up after copying temp file data to original file");
+			}
+		}
+		// Remove temporary file.
+		temp.delete();
+		// Noise was successfully removed and the original file was updated.
+		return true;
 	}
-
+	
 	/**
 	 * A worker thread that runs during the entire lifetime of the
 	 * {@link MovementRecorderService}. Its purpose is to accept
@@ -272,13 +425,22 @@ public class MovementRecorderService extends Service implements SensorEventListe
 			 return;
 		 } else {
 			 // Send batch to file...
-			 // Get batch to write.
-			 final List<SensorEvent> tmp = this.batch;
-			 // Reset for new readings.
-			 this.batch = new ArrayList<>();
-			 this.fileWriterThread.handler.post(new RecordingBatchWriter(this.currentFile, tmp, batchCount));
-			 batchCount++;
+//			 lineCountWithNoise += this.batch.size();
+			 this.writeBatchToFile();
 		 }
+	}
+	
+	private void writeBatchToFile() {
+		// Get batch to write.
+		final List<SensorEvent> tmp = this.batch;
+		// Reset list for new readings.
+		this.batch = new ArrayList<>();
+		// Create runnable with write task.
+		RecordingBatchWriter writer = new RecordingBatchWriter(this.currentFile, tmp, batchCount);
+		// Post work.
+		this.fileWriterThread.handler.post(writer);
+		// Increment batch count.
+		batchCount++;
 	}
 	
 	/*
@@ -328,6 +490,7 @@ public class MovementRecorderService extends Service implements SensorEventListe
 							writer = (new FileWriter(file, false));
 							// Create headers.
 							writer.write("timestamp;x;y;z;label" + newLine);
+							MovementRecorderService.this.lineCountWithNoise++;
 						}
 						else {
 							// File should exist, headers should already be present.
@@ -336,6 +499,7 @@ public class MovementRecorderService extends Service implements SensorEventListe
 						}
 						for(SensorEvent evt : this.batch) {
 							writer.write(evt.timestamp + ";" + evt.values[0] + ";" + evt.values[1] + ";" + evt.values[2] + ";" + MovementRecorderService.this.recordingType + newLine);
+							MovementRecorderService.this.lineCountWithNoise++;
 						}
 					}
 				} catch(IOException ioe) {
