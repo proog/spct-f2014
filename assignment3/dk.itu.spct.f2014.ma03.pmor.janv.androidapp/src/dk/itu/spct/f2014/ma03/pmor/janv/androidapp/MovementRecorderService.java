@@ -19,6 +19,9 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.Environment;
 import android.os.Handler;
@@ -94,6 +97,16 @@ public class MovementRecorderService extends Service implements SensorEventListe
 	
 	private int lineCountWithNoise;
 	
+	/**
+	 * Timestamp for when the current reading was started.
+	 */
+	private long recordingStartedMillis = 0;
+	
+	/**
+	 * If a start signal was given to the user informing that the (actual) recording has begun.
+	 */
+	private boolean startSignalGiven;
+	
 	private static final String newLine = System.getProperty("line.separator");
 	
 	@Override
@@ -140,8 +153,11 @@ public class MovementRecorderService extends Service implements SensorEventListe
 			MovementRecorderService.this.recordingType = recordingType;
 			MovementRecorderService.this.batchCount = 0;
 			MovementRecorderService.this.lineCountWithNoise = 0;
+			MovementRecorderService.this.startSignalGiven = false;
 			// Generate filename.
-			MovementRecorderService.this.currentFile = System.currentTimeMillis() + "_" + recordingType + "_.csv";
+			long time = System.currentTimeMillis();
+			MovementRecorderService.this.recordingStartedMillis = time;
+			MovementRecorderService.this.currentFile = time + "_" + recordingType + "_.csv";
 			/*
 			 *  Start listening for sensor readings.
 			 *  Note this version makes the listener method run on the main thread.
@@ -188,7 +204,7 @@ public class MovementRecorderService extends Service implements SensorEventListe
 						if(deleted) {
 							Toast.makeText(MovementRecorderService.this,
 									"Your recording was too short and hence automatically deleted. A recording must be at least "
-											+ truncateNanos / 1000000000L + " seconds long.",  Toast.LENGTH_LONG)
+											+ (2 * truncateNanos) / 1000000000L + " seconds long.",  Toast.LENGTH_LONG)
 									.show();
 						}
 					}
@@ -199,7 +215,8 @@ public class MovementRecorderService extends Service implements SensorEventListe
 			MovementRecorderService.this.recordingType = null;
 			MovementRecorderService.this.currentFile = null;
 			MovementRecorderService.this.batchCount = 0;
-			
+			MovementRecorderService.this.recordingStartedMillis = 0;
+			MovementRecorderService.this.startSignalGiven = false;
 			return recording;
 		}
 	}
@@ -412,20 +429,33 @@ public class MovementRecorderService extends Service implements SensorEventListe
 	 */
 	@Override
 	public void onSensorChanged(SensorEvent event) {
-		// TODO Auto-generated method stub
 		/*
-		 *  TODO this is called on main thread.
+		 *	This is called on main thread.
 		 *  Post reading to FileWriterThread to do quick return.
 		 */
-		 Log.d("onSensorChanged", "onSensorChanged is running in UI thread = " + (Looper.getMainLooper() == Looper.myLooper()));
-		 Log.d("onSensorChanged", "Sensor values: " + event.values[0] + ", " + event.values[1] + ", " + event.values[2]);
+		 String tag = "onSensorChanged";
+		 Log.d(tag, "Sensor values: " + event.values[0] + ", " + event.values[1] + ", " + event.values[2]);
+		 if(System.currentTimeMillis() - this.recordingStartedMillis < truncateNanos / 1000000) {
+			 Log.d(tag, "Discarding sensor reading: delayed start time not elapsed.");
+			 return;
+		 }
+		 // check if we need to inform user that data gathering begins now.
+		 if(!this.startSignalGiven) {
+			 /*
+			  * Play beep.
+			  * Credit goes to http://stackoverflow.com/questions/2618182/how-to-play-ringtone-alarm-sound-in-android
+			  */
+		    Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+		    Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+		    r.play();
+		    this.startSignalGiven = true;
+		 }
 		 this.batch.add(event);
 		 if(this.batch.size() < 20) {
 			 // Wait for more readings before writing to file.
 			 return;
 		 } else {
 			 // Send batch to file...
-//			 lineCountWithNoise += this.batch.size();
 			 this.writeBatchToFile();
 		 }
 	}
