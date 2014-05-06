@@ -27,6 +27,8 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -35,7 +37,7 @@ public class MovementRecorderService extends Service implements SensorEventListe
 	/**
 	 * Separator for separating values in .csv files.
 	 */
-	public static final String ITEM_SEPARATOR = ";";
+	public static final String ITEM_SEPARATOR = ",";
 	
 	/**
 	 * Minimum number of nanoseconds to remove from end of file (to remove noise).
@@ -107,11 +109,15 @@ public class MovementRecorderService extends Service implements SensorEventListe
 	 */
 	private boolean startSignalGiven;
 	
+	private WakeLock wakeLock;
+	
 	private static final String newLine = System.getProperty("line.separator");
 	
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		// create WakeLock
+		this.wakeLock = ((PowerManager)getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "wakelock");
 		/*
 		 * We use the same FileWriterThread during the entire lifetime of the
 		 * service.
@@ -149,6 +155,7 @@ public class MovementRecorderService extends Service implements SensorEventListe
 			if (MovementRecorderService.this.recording) {
 				return;
 			}
+			MovementRecorderService.this.wakeLock.acquire();
 			MovementRecorderService.this.recording = true;
 			MovementRecorderService.this.recordingType = recordingType;
 			MovementRecorderService.this.batchCount = 0;
@@ -176,7 +183,7 @@ public class MovementRecorderService extends Service implements SensorEventListe
 		public Recording stopRecording() {
 			// Deactivate sensor.
 			MovementRecorderService.this.sensorManager.unregisterListener(MovementRecorderService.this);
-			
+			MovementRecorderService.this.wakeLock.release();
 			
 			
 			// Write any data accumulated in the "buffer".
@@ -528,7 +535,7 @@ public class MovementRecorderService extends Service implements SensorEventListe
 							writer = (new FileWriter(file, true));
 						}
 						for(SensorEvent evt : this.batch) {
-							writer.write(evt.timestamp + ";" + evt.values[0] + ";" + evt.values[1] + ";" + evt.values[2] + ";" + MovementRecorderService.this.recordingType + newLine);
+							writer.write(evt.timestamp + ITEM_SEPARATOR + evt.values[0] + ITEM_SEPARATOR + evt.values[1] + ITEM_SEPARATOR + evt.values[2] + ITEM_SEPARATOR + MovementRecorderService.this.recordingType + newLine);
 							MovementRecorderService.this.lineCountWithNoise++;
 						}
 					}
